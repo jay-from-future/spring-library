@@ -3,6 +3,7 @@ package ru.otus.springlibrary.dao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import ru.otus.springlibrary.dao.exception.CannotUpdateException;
 import ru.otus.springlibrary.domain.Author;
 
 @Repository
