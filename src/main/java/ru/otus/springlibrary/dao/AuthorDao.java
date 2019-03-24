@@ -2,6 +2,8 @@ package ru.otus.springlibrary.dao;
 
 import ru.otus.springlibrary.domain.Author;
 
+import java.util.List;
+
 /**
  * DAO implementation for {@link Author} entity.
  */
@@ -38,4 +40,11 @@ public interface AuthorDao {
      * @return true if entity has been successfully deleted, otherwise - false
      */
     boolean delete(int id);
+
+    /**
+     * Returns all {@link Author} entities from database.
+     *
+     * @return list of authors
+     */
+    List<Author> getAllAuthors();
 }

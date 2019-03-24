@@ -6,9 +6,13 @@ import org.springframework.stereotype.Repository;
 import ru.otus.springlibrary.dao.exception.CannotUpdateException;
 import ru.otus.springlibrary.domain.Author;
 
+import java.util.List;
+
 @Repository
 @RequiredArgsConstructor
 public class AuthorDaoImpl implements AuthorDao {
+
+    private static final String SELECT_ALL_FROM_AUTHOR = "select * from author";
 
     private static final String INSERT_INTO_AUTHOR = "insert into author (firstname, lastname) " +
             "values (:firstName, :lastName)";
@@ -51,5 +55,10 @@ public class AuthorDaoImpl implements AuthorDao {
     @Override
     public boolean delete(int id) {
         return genericDao.delete(id, DELETE_FROM_AUTHOR_BY_ID);
+    }
+
+    @Override
+    public List<Author> getAllAuthors() {
+        return genericDao.getAll(SELECT_ALL_FROM_AUTHOR, authorRowMapper);
     }
 }

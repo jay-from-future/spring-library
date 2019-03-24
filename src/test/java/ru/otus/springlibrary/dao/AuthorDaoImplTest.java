@@ -8,6 +8,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import ru.otus.springlibrary.BasicTest;
 import ru.otus.springlibrary.domain.Author;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class AuthorDaoImplTest extends BasicTest {
@@ -15,6 +17,10 @@ class AuthorDaoImplTest extends BasicTest {
     private static final String FIRST_NAME = "test insert first name";
 
     private static final String LAST_NAME = "test insert last name";
+
+    private static final String TEST_DB_FIRST_NAME = "test db first name";
+
+    private static final String TEST_DB_LAST_NAME = "test db last name";
 
     @Autowired
     AuthorDaoImpl authorDao;
@@ -25,8 +31,8 @@ class AuthorDaoImplTest extends BasicTest {
         Author author = authorDao.findById(id);
 
         assertEquals(id, author.getId());
-        assertEquals("test db first name", author.getFirstName());
-        assertEquals("test db last name", author.getLastName());
+        assertEquals(TEST_DB_FIRST_NAME, author.getFirstName());
+        assertEquals(TEST_DB_LAST_NAME, author.getLastName());
     }
 
     @Test
@@ -77,5 +83,15 @@ class AuthorDaoImplTest extends BasicTest {
         assertTrue(deleteResult);
         assertFalse(deleteAgainResult);
         assertThrows(Exception.class, () -> authorDao.findById(id));
+    }
+
+    @Test
+    void getAllAuthors() {
+        List<Author> allAuthors = authorDao.getAllAuthors();
+
+        assertFalse(allAuthors.isEmpty());
+        Author actual = allAuthors.get(0);
+        assertEquals(TEST_DB_FIRST_NAME, actual.getFirstName());
+        assertEquals(TEST_DB_LAST_NAME, actual.getLastName());
     }
 }
