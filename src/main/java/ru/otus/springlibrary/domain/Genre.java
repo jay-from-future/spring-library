@@ -2,11 +2,9 @@ package ru.otus.springlibrary.domain;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Setter
 @Getter
-@ToString
 public class Genre {
 
     private int id;
@@ -20,5 +18,10 @@ public class Genre {
     public Genre(int id, String genre) {
         this.id = id;
         this.genre = genre;
+    }
+
+    @Override
+    public String toString() {
+        return genre;
     }
 }

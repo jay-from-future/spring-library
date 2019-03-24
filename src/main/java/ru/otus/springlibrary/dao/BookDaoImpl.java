@@ -6,10 +6,13 @@ import org.springframework.stereotype.Repository;
 import ru.otus.springlibrary.domain.Book;
 
 import javax.annotation.PostConstruct;
+import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
 public class BookDaoImpl implements BookDao {
+
+    private static final String SELECT_ALL_FROM_BOOK = "select * from book";
 
     private static final String SELECT_FROM_BOOK_BY_ID = "select * from book where id = :id";
 
@@ -50,5 +53,10 @@ public class BookDaoImpl implements BookDao {
     @Override
     public boolean delete(int id) {
         return false;
+    }
+
+    @Override
+    public List<Book> getAllBooks() {
+        return genericDao.getAll(SELECT_ALL_FROM_BOOK, bookRowMapper);
     }
 }

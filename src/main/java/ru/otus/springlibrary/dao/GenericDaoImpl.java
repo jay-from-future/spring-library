@@ -10,6 +10,8 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.otus.springlibrary.dao.exception.CannotInsertException;
 
+import java.util.List;
+
 @Repository
 @RequiredArgsConstructor
 public class GenericDaoImpl<T> implements GenericDao<T> {
@@ -43,5 +45,10 @@ public class GenericDaoImpl<T> implements GenericDao<T> {
     public boolean delete(int id, String deleteByIdSql) {
         MapSqlParameterSource map = new MapSqlParameterSource("id", id);
         return jdbcOperations.update(deleteByIdSql, map) == 1;
+    }
+
+    @Override
+    public List<T> getAll(String selectAllSql, RowMapper<T> entityMapper) {
+        return jdbcOperations.query(selectAllSql, entityMapper);
     }
 }

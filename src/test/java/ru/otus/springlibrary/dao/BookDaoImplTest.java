@@ -1,6 +1,5 @@
 package ru.otus.springlibrary.dao;
 
-import org.junit.Ignore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +9,15 @@ import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.domain.Book;
 import ru.otus.springlibrary.domain.Genre;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class BookDaoImplTest extends BasicTest {
+
+    private static final String TEST_DB_TITLE = "test db title";
 
     private static final String TEST_BOOK_TITLE = "test book title";
 
@@ -63,6 +66,15 @@ class BookDaoImplTest extends BasicTest {
         Book book = bookDao.findById(id);
 
         assertEquals(id, book.getId());
-        assertEquals("test db title", book.getTitle());
+        assertEquals(TEST_DB_TITLE, book.getTitle());
+    }
+
+    @Test
+    void getAllBooks() {
+        List<Book> allBooks = bookDao.getAllBooks();
+
+        assertEquals(1, allBooks.size());
+        Book actual = allBooks.get(0);
+        assertEquals(TEST_DB_TITLE, actual.getTitle());
     }
 }

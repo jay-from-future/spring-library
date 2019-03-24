@@ -2,6 +2,8 @@ package ru.otus.springlibrary.dao;
 
 import ru.otus.springlibrary.domain.Book;
 
+import java.util.List;
+
 /**
  * DAO implementation for {@link Book} entity.
  */
@@ -38,4 +40,11 @@ public interface BookDao {
      * @return true if entity has been successfully deleted, otherwise - false
      */
     boolean delete(int id);
+
+    /**
+     * Returns all {@link Book} entities from database.
+     *
+     * @return list of books
+     */
+    List<Book> getAllBooks();
 }

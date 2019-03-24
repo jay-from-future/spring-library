@@ -2,11 +2,9 @@ package ru.otus.springlibrary.domain;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Setter
 @Getter
-@ToString
 public class Author {
 
     private int id;
@@ -24,5 +22,10 @@ public class Author {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
+    }
+
+    @Override
+    public String toString() {
+        return firstName + " " + lastName;
     }
 }
