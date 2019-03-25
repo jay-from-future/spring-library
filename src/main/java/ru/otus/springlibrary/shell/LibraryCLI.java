@@ -3,6 +3,7 @@ package ru.otus.springlibrary.shell;
 import lombok.RequiredArgsConstructor;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
+import org.springframework.shell.standard.ShellOption;
 import org.springframework.shell.table.BeanListTableModel;
 import org.springframework.shell.table.BorderStyle;
 import org.springframework.shell.table.Table;
@@ -20,6 +21,11 @@ import java.util.List;
 @ShellComponent
 @RequiredArgsConstructor
 public class LibraryCLI {
+
+    private static final String AUTHOR_HAS_BEEN_SUCCESSFULLY_ADDED = "Author has been successfully added.";
+
+    private static final String AUTHOR_ALREADY_EXISTS = "Cannot add author with firstName = %s, lastName = %s." +
+            " Author already exists!";
 
     private final BookService bookService;
 
@@ -58,6 +64,16 @@ public class LibraryCLI {
         headers.put("genre", "Genre");
         BeanListTableModel model = new BeanListTableModel<>(allGenres, headers);
         return wrapInTable(model);
+    }
+
+    @ShellMethod("Add new author")
+    public void addAuthor(@ShellOption String firstName,
+                          @ShellOption String lastName) {
+        if (authorService.addAuthor(firstName, lastName)) {
+            System.out.println(AUTHOR_HAS_BEEN_SUCCESSFULLY_ADDED);
+        } else {
+            System.err.println(String.format(AUTHOR_ALREADY_EXISTS, firstName, lastName));
+        }
     }
 
     private Table wrapInTable(BeanListTableModel model) {

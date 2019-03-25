@@ -15,4 +15,13 @@ public interface AuthorService {
      * @return list of authors
      */
     List<Author> getAllAuthors();
+
+    /**
+     * Adds new author
+     *
+     * @param firstName author's first name
+     * @param lastName  author's last name
+     * @return true - if author has been added, false - if author already exists
+     */
+    boolean addAuthor(String firstName, String lastName);
 }

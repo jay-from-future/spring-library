@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import ru.otus.springlibrary.BasicTest;
 import ru.otus.springlibrary.domain.Author;
@@ -54,6 +55,12 @@ class AuthorDaoImplTest extends BasicTest {
     void insertAuthorWithTooLongFirstName() {
         Author authorWithTooLongFirstName = new Author(Strings.repeat("A", 256), LAST_NAME);
         assertThrows(DataIntegrityViolationException.class, () -> authorDao.insert(authorWithTooLongFirstName));
+    }
+
+    @Test
+    void tryToInsertExistingAuthor() {
+        Author author = new Author(TEST_DB_FIRST_NAME, TEST_DB_LAST_NAME);
+        assertThrows(DuplicateKeyException.class, () -> authorDao.insert(author));
     }
 
     @Test
