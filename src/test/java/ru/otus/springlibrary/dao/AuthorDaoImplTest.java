@@ -5,9 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import ru.otus.springlibrary.BasicTest;
 import ru.otus.springlibrary.domain.Author;
+import ru.otus.springlibrary.exception.AuthorNotFoundException;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ class AuthorDaoImplTest extends BasicTest {
     AuthorDaoImpl authorDao;
 
     @Test
-    void findAuthorById() {
+    void findAuthorById() throws AuthorNotFoundException {
         int id = 1;
         Author author = authorDao.findById(id);
 
@@ -38,7 +38,7 @@ class AuthorDaoImplTest extends BasicTest {
 
     @Test
     void findAuthorByWrongId() {
-        assertThrows(EmptyResultDataAccessException.class, () -> authorDao.findById(Integer.MAX_VALUE));
+        assertThrows(AuthorNotFoundException.class, () -> authorDao.findById(Integer.MAX_VALUE));
     }
 
     @Test
@@ -80,7 +80,7 @@ class AuthorDaoImplTest extends BasicTest {
     }
 
     @Test
-    void delete() {
+    void deleteNew() {
         Author author = new Author(FIRST_NAME, LAST_NAME);
         int id = authorDao.insert(author).getId();
         boolean deleteResult = authorDao.delete(id);
@@ -90,6 +90,11 @@ class AuthorDaoImplTest extends BasicTest {
         assertTrue(deleteResult);
         assertFalse(deleteAgainResult);
         assertThrows(Exception.class, () -> authorDao.findById(id));
+    }
+
+    @Test
+    void deleteExisting() {
+        assertThrows(DataIntegrityViolationException.class, () -> authorDao.delete(1));
     }
 
     @Test

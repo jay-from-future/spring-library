@@ -1,8 +1,8 @@
-INSERT INTO AUTHOR (FIRSTNAME, LASTNAME)
-VALUES ('test db first name', 'test db last name');
+INSERT INTO AUTHOR (ID, FIRSTNAME, LASTNAME)
+VALUES (1, 'test db first name', 'test db last name');
 
-INSERT INTO GENRE (GENRE)
-VALUES ('test db genre');
+INSERT INTO GENRE (ID, GENRE)
+VALUES (1, 'test db genre');
 
-INSERT INTO BOOK (TITLE, AUTHOR_ID, GENRE_ID)
+INSERT INTO BOOK (TITLE, AUTHOR_FK, GENRE_FK)
 VALUES ('test db title', 1, 1);

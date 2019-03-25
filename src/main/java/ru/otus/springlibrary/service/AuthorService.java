@@ -24,4 +24,12 @@ public interface AuthorService {
      * @return true - if author has been added, false - if author already exists
      */
     boolean addAuthor(String firstName, String lastName);
+
+    /**
+     * Deletes author with such id
+     *
+     * @param id author id
+     * @return true - if author has been deleted, false - if author does not exist
+     */
+    boolean delete(int id);
 }

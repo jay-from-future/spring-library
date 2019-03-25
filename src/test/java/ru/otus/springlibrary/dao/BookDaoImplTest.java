@@ -8,6 +8,9 @@ import ru.otus.springlibrary.BasicTest;
 import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.domain.Book;
 import ru.otus.springlibrary.domain.Genre;
+import ru.otus.springlibrary.exception.AuthorNotFoundException;
+import ru.otus.springlibrary.exception.BookNotFoundException;
+import ru.otus.springlibrary.exception.GenreNotFoundException;
 
 import java.util.List;
 
@@ -29,7 +32,7 @@ class BookDaoImplTest extends BasicTest {
     GenreDaoImpl genreDao;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws AuthorNotFoundException, GenreNotFoundException {
         Author author = mock(Author.class);
         Genre genre = mock(Genre.class);
 
@@ -41,7 +44,7 @@ class BookDaoImplTest extends BasicTest {
     }
 
     @Test
-    void findById() {
+    void findById() throws BookNotFoundException {
         int id = 1;
         Book book = bookDao.findById(id);
 
@@ -57,4 +60,5 @@ class BookDaoImplTest extends BasicTest {
         Book actual = allBooks.get(0);
         assertEquals(TEST_DB_TITLE, actual.getTitle());
     }
+
 }

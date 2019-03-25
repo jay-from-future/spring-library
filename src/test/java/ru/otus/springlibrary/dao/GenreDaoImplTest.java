@@ -2,12 +2,15 @@ package ru.otus.springlibrary.dao;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import ru.otus.springlibrary.BasicTest;
 import ru.otus.springlibrary.domain.Genre;
+import ru.otus.springlibrary.exception.GenreNotFoundException;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class GenreDaoImplTest extends BasicTest {
 
@@ -17,7 +20,7 @@ class GenreDaoImplTest extends BasicTest {
     GenreDaoImpl genreDao;
 
     @Test
-    void findById() {
+    void findById() throws GenreNotFoundException {
         int id = 1;
         Genre genre = genreDao.findById(id);
 
@@ -31,6 +34,11 @@ class GenreDaoImplTest extends BasicTest {
 
         assertEquals(1, allGenres.size());
         assertEquals(TEST_DB_GENRE, allGenres.get(0).getGenre());
+    }
+
+    @Test
+    void deleteExisting() {
+        assertThrows(DataIntegrityViolationException.class, () -> genreDao.delete(1));
     }
 
 }

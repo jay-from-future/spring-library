@@ -3,10 +3,13 @@ package ru.otus.springlibrary.dao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ru.otus.springlibrary.dao.exception.CannotUpdateException;
+import ru.otus.springlibrary.exception.AuthorNotFoundException;
+import ru.otus.springlibrary.exception.CannotInsertException;
+import ru.otus.springlibrary.exception.CannotUpdateException;
 import ru.otus.springlibrary.domain.Author;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -35,21 +38,35 @@ public class AuthorDaoImpl implements AuthorDao {
     @Override
     public Author insert(Author author) {
         int id = genericDao.insert(author, INSERT_INTO_AUTHOR);
-        return findById(id);
+        Author authorById;
+        try {
+            authorById = findById(id);
+        } catch (AuthorNotFoundException e) {
+            throw new CannotInsertException(String.format("Cannot retrieve author with id = %d after insert", id));
+        }
+        return authorById;
     }
 
     @Override
-    public Author findById(int id) {
-        return genericDao.findById(id, SELECT_FROM_AUTHOR_BY_ID, authorRowMapper);
+    public Author findById(int id) throws AuthorNotFoundException {
+        Optional<Author> author = genericDao.findById(id, SELECT_FROM_AUTHOR_BY_ID, authorRowMapper);
+        return author.orElseThrow(AuthorNotFoundException::new);
     }
 
     @Override
     public Author update(Author author) {
+        int id = author.getId();
         int updatedRow = genericDao.update(author, UPDATE_AUTHOR_BY_ID);
         if (updatedRow == 0) {
-            throw new CannotUpdateException("Cannot update: " + author.getId());
+            throw new CannotUpdateException("Cannot update: " + id);
         }
-        return findById(author.getId());
+        Author authorById;
+        try {
+            authorById = findById(id);
+        } catch (AuthorNotFoundException e) {
+            throw new CannotInsertException(String.format("Cannot retrieve author with id = %d after update", id));
+        }
+        return authorById;
     }
 
     @Override

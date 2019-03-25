@@ -1,4 +1,4 @@
-package ru.otus.springlibrary.dao.exception;
+package ru.otus.springlibrary.exception;
 
 public class CannotInsertException extends RuntimeException {
 

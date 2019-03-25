@@ -1,5 +1,6 @@
 package ru.otus.springlibrary.dao;
 
+import ru.otus.springlibrary.exception.GenreNotFoundException;
 import ru.otus.springlibrary.domain.Genre;
 
 import java.util.List;
@@ -22,8 +23,9 @@ public interface GenreDao {
      *
      * @param id unique id in database
      * @return {@link Genre} entity
+     * @throws GenreNotFoundException if genre with such id was not found
      */
-    Genre findById(int id);
+    Genre findById(int id) throws GenreNotFoundException;
 
     /**
      * Updates {@link Genre} entity in database

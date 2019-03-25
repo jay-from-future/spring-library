@@ -15,4 +15,21 @@ public interface GenreService {
      * @return list of genres
      */
     List<Genre> getAllGenres();
+
+    /**
+     * Adds new genre into library
+     *
+     * @param genre genre
+     * @return true - if genre has been added, false - if genre already exists
+     */
+    boolean addGenre(String genre);
+
+    /**
+     * Deletes genre with such id
+     *
+     * @param id genre id
+     * @return true - if genre has been deleted, false - if genre does not exist
+     */
+    boolean delete(int id);
+
 }

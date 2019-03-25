@@ -3,6 +3,8 @@ package ru.otus.springlibrary.dao;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Generic DAO.
@@ -19,14 +21,24 @@ public interface GenericDao<T> {
     int insert(T t, String insertSql);
 
     /**
+     * Inserts entity into database.
+     *
+     * @param t          entity that should be inserted
+     * @param insertSql  SQL insert statement
+     * @param parameters special parameter mapping (if standard not applicable)
+     * @return entity filled with auto-generated id from database
+     */
+    int insert(T t, String insertSql, Map<String, Object> parameters);
+
+    /**
      * Finds entity by id.
      *
      * @param id           unique id in database
      * @param findByIdSql  SQL find by id statement
      * @param entityMapper mapper to convert between database row and entity
-     * @return entity
+     * @return entity, if entity with such id exists
      */
-    T findById(int id, String findByIdSql, RowMapper<T> entityMapper);
+    Optional<T> findById(int id, String findByIdSql, RowMapper<T> entityMapper);
 
     /**
      * Updates entity in database

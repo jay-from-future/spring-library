@@ -20,6 +20,10 @@ public class Genre {
         this.genre = genre;
     }
 
+    public Genre(int id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return genre;

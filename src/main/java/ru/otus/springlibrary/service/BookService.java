@@ -15,4 +15,22 @@ public interface BookService {
      * @return list of books
      */
     List<Book> getAllBooks();
+
+    /**
+     * Adds new book into library
+     *
+     * @param title    book title
+     * @param authorId book author id
+     * @param genreId  book genre id
+     * @return true - if book has been added, false - if book already exists
+     */
+    boolean addBook(String title, int authorId, int genreId);
+
+    /**
+     * Deletes book with such id
+     *
+     * @param id author id
+     * @return true - if book has been deleted, false - if book does not exist
+     */
+    boolean delete(int id);
 }

@@ -24,6 +24,10 @@ public class Author {
         this.lastName = lastName;
     }
 
+    public Author(int id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return firstName + " " + lastName;

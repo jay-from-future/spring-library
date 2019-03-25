@@ -29,4 +29,8 @@ public class Book {
         this.author = author;
         this.genre = genre;
     }
+
+    public Book(String title) {
+        this.title = title;
+    }
 }
