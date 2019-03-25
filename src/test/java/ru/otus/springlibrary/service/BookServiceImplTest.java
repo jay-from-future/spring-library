@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import ru.otus.springlibrary.BasicTest;
-import ru.otus.springlibrary.dao.BookDaoImpl;
+import ru.otus.springlibrary.dao.BookDao;
 import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.domain.Book;
 import ru.otus.springlibrary.domain.Genre;
@@ -13,7 +13,7 @@ import ru.otus.springlibrary.domain.Genre;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 class BookServiceImplTest extends BasicTest {
@@ -24,7 +24,7 @@ class BookServiceImplTest extends BasicTest {
     BookService bookService;
 
     @MockBean
-    BookDaoImpl bookDao;
+    BookDao bookDao;
 
     @BeforeEach
     void setUp() {

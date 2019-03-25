@@ -5,11 +5,15 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.otus.springlibrary.domain.Genre;
 
+import java.util.List;
+
 @Repository
 @RequiredArgsConstructor
 public class GenreDaoImpl implements GenreDao {
 
     private static final String SELECT_FROM_GENRE_BY_ID = "select * from genre where id = :id";
+
+    private static final String SELECT_ALL_FROM_GENRE = "select * from genre";
 
     private final GenericDao<Genre> genericDao;
 
@@ -36,5 +40,10 @@ public class GenreDaoImpl implements GenreDao {
     @Override
     public boolean delete(int id) {
         return false;
+    }
+
+    @Override
+    public List<Genre> getAllGenres() {
+        return genericDao.getAll(SELECT_ALL_FROM_GENRE, genreRowMapper);
     }
 }

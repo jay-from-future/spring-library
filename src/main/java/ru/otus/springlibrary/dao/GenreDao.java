@@ -2,6 +2,8 @@ package ru.otus.springlibrary.dao;
 
 import ru.otus.springlibrary.domain.Genre;
 
+import java.util.List;
+
 /**
  * DAO implementation for {@link Genre} entity.
  */
@@ -38,4 +40,11 @@ public interface GenreDao {
      * @return true if entity has been successfully deleted, otherwise - false
      */
     boolean delete(int id);
+
+    /**
+     * Returns all {@link Genre} entities from database.
+     *
+     * @return list of genres
+     */
+    List<Genre> getAllGenres();
 }
