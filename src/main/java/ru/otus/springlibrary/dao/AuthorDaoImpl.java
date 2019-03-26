@@ -48,14 +48,14 @@ public class AuthorDaoImpl implements AuthorDao {
     }
 
     @Override
-    public Author findById(int id) throws AuthorNotFoundException {
+    public Author findById(long id) throws AuthorNotFoundException {
         Optional<Author> author = genericDao.findById(id, SELECT_FROM_AUTHOR_BY_ID, authorRowMapper);
         return author.orElseThrow(AuthorNotFoundException::new);
     }
 
     @Override
     public Author update(Author author) {
-        int id = author.getId();
+        long id = author.getId();
         int updatedRow = genericDao.update(author, UPDATE_AUTHOR_BY_ID);
         if (updatedRow == 0) {
             throw new CannotUpdateException("Cannot update: " + id);
@@ -70,7 +70,7 @@ public class AuthorDaoImpl implements AuthorDao {
     }
 
     @Override
-    public boolean delete(int id) {
+    public boolean delete(long id) {
         return genericDao.delete(id, DELETE_FROM_AUTHOR_BY_ID);
     }
 

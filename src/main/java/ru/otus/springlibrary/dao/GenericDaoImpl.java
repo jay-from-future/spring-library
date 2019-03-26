@@ -40,7 +40,7 @@ public class GenericDaoImpl<T> implements GenericDao<T> {
     }
 
     @Override
-    public Optional<T> findById(int id, String findByIdSql, RowMapper<T> entityMapper) {
+    public Optional<T> findById(long id, String findByIdSql, RowMapper<T> entityMapper) {
         MapSqlParameterSource map = new MapSqlParameterSource("id", id);
         T item = null;
         try {
@@ -58,7 +58,7 @@ public class GenericDaoImpl<T> implements GenericDao<T> {
 
 
     @Override
-    public boolean delete(int id, String deleteByIdSql) {
+    public boolean delete(long id, String deleteByIdSql) {
         MapSqlParameterSource map = new MapSqlParameterSource("id", id);
         return jdbcOperations.update(deleteByIdSql, map) == 1;
     }

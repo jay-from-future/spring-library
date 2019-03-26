@@ -30,6 +30,6 @@ public interface GenreService {
      * @param id genre id
      * @return true - if genre has been deleted, false - if genre does not exist
      */
-    boolean delete(int id);
+    boolean delete(long id);
 
 }

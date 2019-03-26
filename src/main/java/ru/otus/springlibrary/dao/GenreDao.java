@@ -25,7 +25,7 @@ public interface GenreDao {
      * @return {@link Genre} entity
      * @throws GenreNotFoundException if genre with such id was not found
      */
-    Genre findById(int id) throws GenreNotFoundException;
+    Genre findById(long id) throws GenreNotFoundException;
 
     /**
      * Updates {@link Genre} entity in database
@@ -41,7 +41,7 @@ public interface GenreDao {
      * @param id id of {@link Genre} entity that should be deleted
      * @return true if entity has been successfully deleted, otherwise - false
      */
-    boolean delete(int id);
+    boolean delete(long id);
 
     /**
      * Returns all {@link Genre} entities from database.

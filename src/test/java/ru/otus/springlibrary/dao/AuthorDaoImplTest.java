@@ -82,7 +82,7 @@ class AuthorDaoImplTest extends BasicTest {
     @Test
     void deleteNew() {
         Author author = new Author(FIRST_NAME, LAST_NAME);
-        int id = authorDao.insert(author).getId();
+        long id = authorDao.insert(author).getId();
         boolean deleteResult = authorDao.delete(id);
         boolean deleteAgainResult = authorDao.delete(id);
 

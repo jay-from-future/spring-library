@@ -9,7 +9,7 @@ import lombok.ToString;
 @ToString
 public class Book {
 
-    private int id;
+    private long id;
 
     private String title;
 
@@ -23,7 +23,7 @@ public class Book {
         this.genre = genre;
     }
 
-    public Book(int id, String title, Author author, Genre genre) {
+    public Book(long id, String title, Author author, Genre genre) {
         this.id = id;
         this.title = title;
         this.author = author;

@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 public class Genre {
 
-    private int id;
+    private long id;
 
     private String genre;
 
@@ -15,12 +15,12 @@ public class Genre {
         this.genre = genre;
     }
 
-    public Genre(int id, String genre) {
+    public Genre(long id, String genre) {
         this.id = id;
         this.genre = genre;
     }
 
-    public Genre(int id) {
+    public Genre(long id) {
         this.id = id;
     }
 

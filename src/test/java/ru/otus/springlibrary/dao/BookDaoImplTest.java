@@ -36,16 +36,16 @@ class BookDaoImplTest extends BasicTest {
         Author author = mock(Author.class);
         Genre genre = mock(Genre.class);
 
-        when(author.getId()).thenReturn(1);
+        when(author.getId()).thenReturn(1L);
         when(authorDao.findById(1)).thenReturn(author);
 
-        when(genre.getId()).thenReturn(1);
+        when(genre.getId()).thenReturn(1L);
         when(genreDao.findById(1)).thenReturn(genre);
     }
 
     @Test
     void findById() throws BookNotFoundException {
-        int id = 1;
+        long id = 1L;
         Book book = bookDao.findById(id);
 
         assertEquals(id, book.getId());
@@ -56,7 +56,7 @@ class BookDaoImplTest extends BasicTest {
     void getAllBooks() {
         List<Book> allBooks = bookDao.getAllBooks();
 
-        assertEquals(1, allBooks.size());
+        assertEquals(1L, allBooks.size());
         Book actual = allBooks.get(0);
         assertEquals(TEST_DB_TITLE, actual.getTitle());
     }

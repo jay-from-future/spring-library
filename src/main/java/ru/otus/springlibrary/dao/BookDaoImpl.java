@@ -46,7 +46,7 @@ public class BookDaoImpl implements BookDao {
     }
 
     @Override
-    public Book findById(int id) throws BookNotFoundException {
+    public Book findById(long id) throws BookNotFoundException {
         Optional<Book> book = genericDao.findById(id, SELECT_FROM_BOOK_BY_ID, bookRowMapper);
         return book.orElseThrow(BookNotFoundException::new);
     }
@@ -57,7 +57,7 @@ public class BookDaoImpl implements BookDao {
     }
 
     @Override
-    public boolean delete(int id) {
+    public boolean delete(long id) {
         return genericDao.delete(id, DELETE_FROM_BOOK_BY_ID);
     }
 

@@ -25,7 +25,7 @@ public interface AuthorDao {
      * @return {@link Author} entity
      * @throws AuthorNotFoundException if author with such id was not found
      */
-    Author findById(int id) throws AuthorNotFoundException;
+    Author findById(long id) throws AuthorNotFoundException;
 
     /**
      * Updates {@link Author} entity in database
@@ -41,7 +41,7 @@ public interface AuthorDao {
      * @param id id of {@link Author} entity that should be deleted
      * @return true if entity has been successfully deleted, otherwise - false
      */
-    boolean delete(int id);
+    boolean delete(long id);
 
     /**
      * Returns all {@link Author} entities from database.

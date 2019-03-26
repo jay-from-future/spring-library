@@ -38,7 +38,7 @@ public interface GenericDao<T> {
      * @param entityMapper mapper to convert between database row and entity
      * @return entity, if entity with such id exists
      */
-    Optional<T> findById(int id, String findByIdSql, RowMapper<T> entityMapper);
+    Optional<T> findById(long id, String findByIdSql, RowMapper<T> entityMapper);
 
     /**
      * Updates entity in database
@@ -56,7 +56,7 @@ public interface GenericDao<T> {
      * @param deleteByIdSql SQL delete by id statement
      * @return true if entity has been successfully deleted, otherwise - false
      */
-    boolean delete(int id, String deleteByIdSql);
+    boolean delete(long id, String deleteByIdSql);
 
     /**
      * Returns all entities of this type from database

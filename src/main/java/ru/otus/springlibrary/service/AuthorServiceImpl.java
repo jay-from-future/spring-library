@@ -36,7 +36,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public boolean delete(int id) {
+    public boolean delete(long id) {
         boolean result = false;
         try {
             result = authorDao.delete(id);

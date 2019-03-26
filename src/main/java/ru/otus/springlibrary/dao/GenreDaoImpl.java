@@ -3,9 +3,9 @@ package ru.otus.springlibrary.dao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import ru.otus.springlibrary.domain.Genre;
 import ru.otus.springlibrary.exception.CannotInsertException;
 import ru.otus.springlibrary.exception.GenreNotFoundException;
-import ru.otus.springlibrary.domain.Genre;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +42,7 @@ public class GenreDaoImpl implements GenreDao {
     }
 
     @Override
-    public Genre findById(int id) throws GenreNotFoundException {
+    public Genre findById(long id) throws GenreNotFoundException {
         Optional<Genre> genre = genericDao.findById(id, SELECT_FROM_GENRE_BY_ID, genreRowMapper);
         return genre.orElseThrow(GenreNotFoundException::new);
     }
@@ -53,7 +53,7 @@ public class GenreDaoImpl implements GenreDao {
     }
 
     @Override
-    public boolean delete(int id) {
+    public boolean delete(long id) {
         return genericDao.delete(id, DELETE_FROM_GENRE_BY_ID);
     }
 

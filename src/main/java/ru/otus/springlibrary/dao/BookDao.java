@@ -25,7 +25,7 @@ public interface BookDao {
      * @return {@link Book} entity
      * @throws BookNotFoundException if book with such id was not found
      */
-    Book findById(int id) throws BookNotFoundException;
+    Book findById(long id) throws BookNotFoundException;
 
     /**
      * Updates {@link Book} entity in database
@@ -41,7 +41,7 @@ public interface BookDao {
      * @param id id of {@link Book} entity that should be deleted
      * @return true if entity has been successfully deleted, otherwise - false
      */
-    boolean delete(int id);
+    boolean delete(long id);
 
     /**
      * Returns all {@link Book} entities from database.

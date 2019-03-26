@@ -31,5 +31,5 @@ public interface AuthorService {
      * @param id author id
      * @return true - if author has been deleted, false - if author does not exist
      */
-    boolean delete(int id);
+    boolean delete(long id);
 }

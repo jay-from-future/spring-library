@@ -24,7 +24,7 @@ public interface BookService {
      * @param genreId  book genre id
      * @return true - if book has been added, false - if book already exists
      */
-    boolean addBook(String title, int authorId, int genreId);
+    boolean addBook(String title, long authorId, long genreId);
 
     /**
      * Deletes book with such id
@@ -32,5 +32,5 @@ public interface BookService {
      * @param id author id
      * @return true - if book has been deleted, false - if book does not exist
      */
-    boolean delete(int id);
+    boolean delete(long id);
 }

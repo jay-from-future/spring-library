@@ -36,7 +36,7 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
-    public boolean delete(int id) {
+    public boolean delete(long id) {
         boolean result = false;
         try {
             result = genreDao.delete(id);

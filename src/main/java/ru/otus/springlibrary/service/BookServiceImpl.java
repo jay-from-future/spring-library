@@ -26,7 +26,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public boolean addBook(String title, int authorId, int genreId) {
+    public boolean addBook(String title, long authorId, long genreId) {
         try {
             bookDao.insert(new Book(title, new Author(authorId), new Genre(genreId)));
             return true;
@@ -37,7 +37,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public boolean delete(int id) {
+    public boolean delete(long id) {
         return bookDao.delete(id);
     }
 }
