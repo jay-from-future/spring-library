@@ -31,11 +31,11 @@ public class LibraryCLI {
 
     private static final String HAS_BEEN_SUCCESSFULLY_ADDED = "%s has been successfully added.";
 
-    private static final String AUTHOR = "Author";
+    private static final String AUTHOR = "author";
 
-    private static final String BOOK = "Book";
+    private static final String BOOK = "book";
 
-    private static final String GENRE = "Genre";
+    private static final String GENRE = "genre";
 
     private static final List<String> TYPES = Arrays.asList(AUTHOR, BOOK, GENRE);
 

@@ -2,10 +2,10 @@ package ru.otus.springlibrary.dao;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import ru.otus.springlibrary.exception.BookNotFoundException;
-import ru.otus.springlibrary.exception.CannotInsertException;
 import ru.otus.springlibrary.dao.mapper.BookRowMapper;
 import ru.otus.springlibrary.domain.Book;
+import ru.otus.springlibrary.exception.BookNotFoundException;
+import ru.otus.springlibrary.exception.CannotInsertException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,9 +15,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BookDaoImpl implements BookDao {
 
-    private static final String SELECT_ALL_FROM_BOOK = "select * from book";
+    private static final String SELECT_ALL_FROM_BOOK = "select b.id, title, firstname, lastname, genre from book b " +
+            "join author a on b.author_fk = a.id join genre g on b.genre_fk = g.id";
 
-    private static final String SELECT_FROM_BOOK_BY_ID = "select * from book where id = :id";
+    private static final String SELECT_FROM_BOOK_BY_ID = "select b.id, title, firstname, lastname, genre from book b " +
+            "join author a on b.author_fk = a.id join genre g on b.genre_fk = g.id where b.id = :id";
 
     private static final String INSERT_BOOK = "insert into book (title, author_fk, genre_fk) " +
             "values (:title, :authorId, :genreId)";
