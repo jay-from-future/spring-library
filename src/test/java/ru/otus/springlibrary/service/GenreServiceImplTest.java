@@ -2,9 +2,13 @@ package ru.otus.springlibrary.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import ru.otus.springlibrary.BasicTest;
+import org.springframework.shell.jline.InteractiveShellApplicationRunner;
+import org.springframework.shell.jline.ScriptShellApplicationRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import ru.otus.springlibrary.dao.GenreDao;
 import ru.otus.springlibrary.domain.Genre;
 
@@ -14,7 +18,12 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
-class GenreServiceImplTest extends BasicTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest(properties = {
+        ScriptShellApplicationRunner.SPRING_SHELL_SCRIPT_ENABLED + "=false",
+        InteractiveShellApplicationRunner.SPRING_SHELL_INTERACTIVE_ENABLED + "=false"
+})
+class GenreServiceImplTest {
 
     private static final String TEST_GENRE = "test genre";
 

@@ -2,9 +2,12 @@ package ru.otus.springlibrary.dao;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import ru.otus.springlibrary.BasicTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.test.context.junit4.SpringRunner;
 import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.domain.Book;
 import ru.otus.springlibrary.domain.Genre;
@@ -14,11 +17,14 @@ import ru.otus.springlibrary.exception.GenreNotFoundException;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class BookDaoImplTest extends BasicTest {
+@RunWith(SpringRunner.class)
+@JdbcTest
+@ComponentScan
+class BookDaoImplTest {
 
     private static final String TEST_DB_TITLE = "test db title";
 
@@ -61,4 +67,8 @@ class BookDaoImplTest extends BasicTest {
         assertEquals(TEST_DB_TITLE, actual.getTitle());
     }
 
+    @Test
+    void deleteExistingBook() {
+        assertTrue(bookDao.delete(1L));
+    }
 }

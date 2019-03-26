@@ -1,23 +1,28 @@
 package ru.otus.springlibrary.dao;
 
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.dao.DataIntegrityViolationException;
-import ru.otus.springlibrary.BasicTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import ru.otus.springlibrary.domain.Genre;
 import ru.otus.springlibrary.exception.GenreNotFoundException;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
-class GenreDaoImplTest extends BasicTest {
+@RunWith(SpringRunner.class)
+@JdbcTest
+@ComponentScan
+class GenreDaoImplTest {
 
     private static final String TEST_DB_GENRE = "test db genre";
 
     @Autowired
-    GenreDaoImpl genreDao;
+    GenreDao genreDao;
 
     @Test
     void findById() throws GenreNotFoundException {
