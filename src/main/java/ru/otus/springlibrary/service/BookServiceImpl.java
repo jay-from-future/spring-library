@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
 
-    private static final Logger logger = LoggerFactory.getLogger(GenreServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(BookServiceImpl.class);
 
     private final BookDao bookDao;
 

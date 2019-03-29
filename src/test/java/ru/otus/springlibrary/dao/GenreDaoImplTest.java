@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.otus.springlibrary.domain.Genre;
@@ -12,11 +12,12 @@ import ru.otus.springlibrary.exception.GenreNotFoundException;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @RunWith(SpringRunner.class)
 @JdbcTest
-@ComponentScan
+@Import({GenreDaoImpl.class, GenericDaoImpl.class})
 class GenreDaoImplTest {
 
     private static final String TEST_DB_GENRE = "test db genre";

@@ -19,7 +19,7 @@ public class BookDaoImpl implements BookDao {
             "join author a on b.author_fk = a.id join genre g on b.genre_fk = g.id";
 
     private static final String SELECT_FROM_BOOK_BY_ID = "select b.id, title, firstname, lastname, genre from book b " +
-            "join author a on b.author_fk = a.id join genre g on b.genre_fk = g.id where b.id = :id";
+            "left outer join author a on b.author_fk = a.id left outer join genre g on b.genre_fk = g.id where b.id = :id";
 
     private static final String INSERT_BOOK = "insert into book (title, author_fk, genre_fk) " +
             "values (:title, :authorId, :genreId)";

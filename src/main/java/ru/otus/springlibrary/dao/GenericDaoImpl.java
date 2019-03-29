@@ -23,7 +23,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class GenericDaoImpl<T> implements GenericDao<T> {
 
-    private static final Logger logger = LoggerFactory.getLogger(GenreServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(GenericDaoImpl.class);
 
     private final NamedParameterJdbcOperations jdbcOperations;
 

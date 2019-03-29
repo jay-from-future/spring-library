@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthorServiceImpl implements AuthorService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthorService.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthorServiceImpl.class);
 
     private final AuthorDao authorDao;
 
