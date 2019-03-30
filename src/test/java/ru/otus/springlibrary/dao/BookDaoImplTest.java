@@ -4,11 +4,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.otus.springlibrary.dao.mapper.BookRowMapper;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.domain.Book;
 import ru.otus.springlibrary.domain.Genre;
@@ -16,28 +17,27 @@ import ru.otus.springlibrary.exception.AuthorNotFoundException;
 import ru.otus.springlibrary.exception.BookNotFoundException;
 import ru.otus.springlibrary.exception.GenreNotFoundException;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
-@JdbcTest
-@Import({BookDaoImpl.class, BookRowMapper.class, GenericDaoImpl.class})
+@DataJpaTest
+@Import({BookDaoImpl.class, GenericDaoImpl.class})
+@Transactional(propagation = Propagation.NOT_SUPPORTED)
 class BookDaoImplTest {
 
     private static final String TEST_DB_TITLE = "test db title";
 
     @Autowired
-    BookDaoImpl bookDao;
+    BookDao bookDao;
 
     @MockBean
-    AuthorDaoImpl authorDao;
+    AuthorDao authorDao;
 
     @MockBean
-    GenreDaoImpl genreDao;
+    GenreDao genreDao;
 
     @BeforeEach
     void setUp() throws AuthorNotFoundException, GenreNotFoundException {
@@ -61,16 +61,9 @@ class BookDaoImplTest {
     }
 
     @Test
-    void getAllBooks() {
-        List<Book> allBooks = bookDao.getAllBooks();
-
-        assertEquals(1L, allBooks.size());
-        Book actual = allBooks.get(0);
-        assertEquals(TEST_DB_TITLE, actual.getTitle());
-    }
-
-    @Test
-    void deleteExistingBook() {
-        assertTrue(bookDao.delete(1L));
+    void deleteExistingBook() throws BookNotFoundException {
+        Book book = bookDao.findById(1);
+        bookDao.delete(book);
+        assertThrows(BookNotFoundException.class, () -> bookDao.findById(1));
     }
 }

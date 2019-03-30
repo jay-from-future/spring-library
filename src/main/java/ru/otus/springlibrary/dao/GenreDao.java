@@ -1,7 +1,7 @@
 package ru.otus.springlibrary.dao;
 
-import ru.otus.springlibrary.exception.GenreNotFoundException;
 import ru.otus.springlibrary.domain.Genre;
+import ru.otus.springlibrary.exception.GenreNotFoundException;
 
 import java.util.List;
 
@@ -14,9 +14,8 @@ public interface GenreDao {
      * Inserts {@link Genre} entity into database.
      *
      * @param genre {@link Genre} entity that should be inserted
-     * @return {@link Genre} entity filled with auto-generated id from database
      */
-    Genre insert(Genre genre);
+    void insert(Genre genre);
 
     /**
      * Finds {@link Genre} entity by id.
@@ -31,17 +30,15 @@ public interface GenreDao {
      * Updates {@link Genre} entity in database
      *
      * @param genre {@link Genre} entity
-     * @return updated {@link Genre} entity from the database
      */
-    Genre update(Genre genre);
+    void update(Genre genre);
 
     /**
      * Deletes {@link Genre} entity from database
      *
-     * @param id id of {@link Genre} entity that should be deleted
-     * @return true if entity has been successfully deleted, otherwise - false
+     * @param genre {@link Genre} entity that should be deleted
      */
-    boolean delete(long id);
+    void delete(Genre genre);
 
     /**
      * Returns all {@link Genre} entities from database.

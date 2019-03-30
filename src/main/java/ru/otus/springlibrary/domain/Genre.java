@@ -1,22 +1,31 @@
 package ru.otus.springlibrary.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "GENRE")
 @Setter
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@NamedQuery(name = "findAllGenres", query = "select g from Genre g")
 public class Genre {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "genre_generator")
+    @SequenceGenerator(name = "genre_generator", sequenceName = "genre_sequence")
+    @Column(updatable = false)
     private long id;
 
+    @Column(name = "GENRE")
     private String genre;
 
     public Genre(String genre) {
-        this.genre = genre;
-    }
-
-    public Genre(long id, String genre) {
-        this.id = id;
         this.genre = genre;
     }
 

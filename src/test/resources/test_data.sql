@@ -1,8 +1,8 @@
 INSERT INTO AUTHOR (ID, FIRSTNAME, LASTNAME)
-VALUES (1, 'test db first name', 'test db last name');
+VALUES (AUTHOR_SEQUENCE.NEXTVAL, 'test db first name', 'test db last name');
 
 INSERT INTO GENRE (ID, GENRE)
-VALUES (1, 'test db genre');
+VALUES (GENRE_SEQUENCE.NEXTVAL, 'test db genre');
 
-INSERT INTO BOOK (TITLE, AUTHOR_FK, GENRE_FK)
-VALUES ('test db title', 1, 1);
+INSERT INTO BOOK (ID, TITLE, AUTHOR_ID, GENRE_ID)
+VALUES (BOOK_SEQUENCE.NEXTVAL, 'test db title', 1, 1);

@@ -1,7 +1,7 @@
 package ru.otus.springlibrary.dao;
 
-import ru.otus.springlibrary.exception.AuthorNotFoundException;
 import ru.otus.springlibrary.domain.Author;
+import ru.otus.springlibrary.exception.AuthorNotFoundException;
 
 import java.util.List;
 
@@ -14,9 +14,8 @@ public interface AuthorDao {
      * Inserts {@link Author} entity into database.
      *
      * @param author {@link Author} entity that should be inserted
-     * @return {@link Author} entity filled with auto-generated id from database
      */
-    Author insert(Author author);
+    void insert(Author author);
 
     /**
      * Finds {@link Author} entity by id.
@@ -31,17 +30,15 @@ public interface AuthorDao {
      * Updates {@link Author} entity in database
      *
      * @param author {@link Author} entity
-     * @return updated {@link Author} entity from the database
      */
-    Author update(Author author);
+    void update(Author author);
 
     /**
      * Deletes {@link Author} entity from database
      *
-     * @param id id of {@link Author} entity that should be deleted
-     * @return true if entity has been successfully deleted, otherwise - false
+     * @param author {@link Author} entity that should be deleted
      */
-    boolean delete(long id);
+    void delete(Author author);
 
     /**
      * Returns all {@link Author} entities from database.

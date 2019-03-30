@@ -22,8 +22,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -47,13 +45,11 @@ class BookServiceImplTest {
     @MockBean
     GenreDao genreDao;
 
-    private Book book;
-
     @BeforeEach
     void setUp() throws AuthorNotFoundException, GenreNotFoundException {
         Author author = new Author(1, "test first name", "test last name");
         Genre genre = new Genre(1, "test genre");
-        book = new Book(1, TEST_TITLE, author, genre);
+        Book book = new Book(1, TEST_TITLE, author, genre);
 
         when(bookDao.getAllBooks()).thenReturn(Collections.singletonList(book));
         // existing items
@@ -72,12 +68,6 @@ class BookServiceImplTest {
         assertEquals(1, allBooks.size());
         Book actual = allBooks.get(0);
         assertEquals(TEST_TITLE, actual.getTitle());
-    }
-
-    @Test
-    void addBook() {
-        when(bookDao.insert(any())).thenReturn(book);
-        assertTrue(bookService.addBook(TEST_TITLE, 2, 2));
     }
 
 }

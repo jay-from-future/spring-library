@@ -3,11 +3,12 @@ package ru.otus.springlibrary.service;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import ru.otus.springlibrary.dao.AuthorDao;
 import ru.otus.springlibrary.domain.Author;
+import ru.otus.springlibrary.exception.AuthorNotFoundException;
 
 import java.util.List;
 
@@ -27,9 +28,10 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public boolean addAuthor(String firstName, String lastName) {
         try {
+            // todo add check that authot existing or not before perform insert, otherwise id will be incremented for useless attempts
             authorDao.insert(new Author(firstName, lastName));
             return true;
-        } catch (DuplicateKeyException e) {
+        } catch (DataIntegrityViolationException e) {
             logger.debug(e.getMessage());
         }
         return false;
@@ -37,12 +39,13 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public boolean delete(long id) {
-        boolean result = false;
         try {
-            result = authorDao.delete(id);
-        } catch (DataAccessException e) {
-            logger.debug(e.getMessage());
+            Author author = authorDao.findById(id);
+            authorDao.delete(author);
+        } catch (AuthorNotFoundException | DataIntegrityViolationException e) {
+            logger.debug("Cannot remove author with id = " + id, e);
+            return false;
         }
-        return result;
+        return true;
     }
 }
