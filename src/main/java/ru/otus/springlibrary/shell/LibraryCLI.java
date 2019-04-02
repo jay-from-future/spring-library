@@ -4,13 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
-import org.springframework.shell.table.BeanListTableModel;
-import org.springframework.shell.table.BorderStyle;
-import org.springframework.shell.table.Table;
-import org.springframework.shell.table.TableBuilder;
+import org.springframework.shell.table.*;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.domain.Book;
 import ru.otus.springlibrary.domain.Genre;
+import ru.otus.springlibrary.exception.BookNotFoundException;
 import ru.otus.springlibrary.service.AuthorService;
 import ru.otus.springlibrary.service.BookService;
 import ru.otus.springlibrary.service.GenreService;
@@ -49,6 +48,62 @@ public class LibraryCLI {
     private final AuthorService authorService;
 
     private final GenreService genreService;
+
+    @ShellMethod("Show book reviews")
+    @Transactional
+    public Table showBookReviews(@ShellOption long bookId) {
+        try {
+            Book book = bookService.findById(bookId);
+            System.out.println(String.format("%d | %s | %s | %s", book.getId(), book.getTitle(), book.getAuthor(),
+                    book.getGenre()));
+            LinkedHashMap<String, Object> headers = new LinkedHashMap<>();
+            headers.put("id", "Id");
+            headers.put("review", "Review");
+            BeanListTableModel model = new BeanListTableModel<>(book.getReviews(), headers);
+            return wrapInTableWithReviews(model);
+        } catch (BookNotFoundException e) {
+            System.err.println(String.format("Book with id = %d does not exist!", bookId));
+            return null;
+        }
+    }
+
+    @ShellMethod("Add review to book")
+    public void addReview(@ShellOption long bookId,
+                          @ShellOption String review) {
+        if (checkReviewLength(review)) {
+            return;
+        }
+        boolean result = bookService.addReview(bookId, review);
+        if (result) {
+            System.out.println("Review comment has been successfully added");
+        } else {
+            System.err.println("Review comment cannot be added");
+        }
+    }
+
+    @ShellMethod("Remove book review")
+    public void removeReview(@ShellOption long reviewId) {
+        boolean result = bookService.deleteReview(reviewId);
+        if (result) {
+            System.out.println("Review comment has been successfully removed");
+        } else {
+            System.err.println("Review comment cannot be removed");
+        }
+    }
+
+    @ShellMethod("Update book review")
+    public void updateReview(@ShellOption long reviewId,
+                             @ShellOption String updatedReview) {
+        if (checkReviewLength(updatedReview)) {
+            return;
+        }
+        boolean result = bookService.updateReview(reviewId, updatedReview);
+        if (result) {
+            System.out.println("Review comment has been successfully updated");
+        } else {
+            System.err.println("Review comment cannot be updated");
+        }
+    }
 
     @ShellMethod("Show all books")
     public Table showAllBooks() {
@@ -91,8 +146,8 @@ public class LibraryCLI {
 
     @ShellMethod("Add new book")
     public void addBook(@ShellOption String title,
-                        @ShellOption int authorId,
-                        @ShellOption int genreId) {
+                        @ShellOption long authorId,
+                        @ShellOption long genreId) {
         printResult(bookService.addBook(title, authorId, genreId), BOOK);
     }
 
@@ -103,7 +158,7 @@ public class LibraryCLI {
 
     @ShellMethod("Remove item")
     public void removeItem(@ShellOption String type,
-                           @ShellOption int id) {
+                           @ShellOption long id) {
         // check that type exists
         if (TYPES.stream().noneMatch(t -> t.equals(type))) {
             System.err.println(format(TYPE_IS_INCORRECT, type, Arrays.toString(TYPES.toArray())));
@@ -135,11 +190,26 @@ public class LibraryCLI {
         return tableBuilder.build();
     }
 
+    private Table wrapInTableWithReviews(BeanListTableModel model) {
+        TableBuilder tableBuilder = new TableBuilder(model);
+        tableBuilder.on(CellMatchers.column(1)).addSizer(new AbsoluteWidthSizeConstraints(40));
+        tableBuilder.addFullBorder(BorderStyle.oldschool);
+        return tableBuilder.build();
+    }
+
     private void printResult(boolean result, String type) {
         if (result) {
             System.out.println(format(HAS_BEEN_SUCCESSFULLY_ADDED, type));
         } else {
             System.err.println(format(ALREADY_EXISTS, type));
         }
+    }
+
+    private boolean checkReviewLength(@ShellOption String newReview) {
+        if (newReview.length() > 255) {
+            System.err.println("Review text is longer than 255 symbols which is maximum allowed!");
+            return true;
+        }
+        return false;
     }
 }

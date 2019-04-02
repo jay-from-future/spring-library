@@ -8,8 +8,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 @Repository
-@RequiredArgsConstructor
 @Transactional
+@RequiredArgsConstructor
 public class GenericDaoImpl<T> implements GenericDao<T> {
 
     @PersistenceContext
@@ -33,8 +33,10 @@ public class GenericDaoImpl<T> implements GenericDao<T> {
     @Override
     public void delete(T t) {
         if (em.contains(t)) {
+            // remove managed entity
             em.remove(t);
         } else {
+            // remove detached entity
             em.remove(em.merge(t));
         }
     }

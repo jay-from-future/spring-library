@@ -5,11 +5,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.springlibrary.dao.BookDao;
+import ru.otus.springlibrary.dao.ReviewDao;
 import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.domain.Book;
 import ru.otus.springlibrary.domain.Genre;
+import ru.otus.springlibrary.domain.Review;
 import ru.otus.springlibrary.exception.BookNotFoundException;
+import ru.otus.springlibrary.exception.ReviewNotFoundException;
 
 import java.util.List;
 
@@ -20,6 +24,8 @@ public class BookServiceImpl implements BookService {
     private static final Logger logger = LoggerFactory.getLogger(BookServiceImpl.class);
 
     private final BookDao bookDao;
+
+    private final ReviewDao reviewDao;
 
     @Override
     public List<Book> getAllBooks() {
@@ -48,5 +54,58 @@ public class BookServiceImpl implements BookService {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public Book findById(long id) throws BookNotFoundException {
+        return bookDao.findById(id);
+    }
+
+    @Override
+    @Transactional
+    public boolean addReview(long id, String reviewText) {
+        boolean result = true;
+        try {
+            Review review = new Review(reviewText);
+            reviewDao.insert(review);
+
+            Book book = findById(id);
+            book.addReview(review);
+            bookDao.update(book);
+        } catch (BookNotFoundException e) {
+            result = false;
+        }
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteReview(long reviewId) {
+        boolean result = true;
+        try {
+            Review review = reviewDao.findById(reviewId);
+            reviewDao.delete(review);
+
+            Book book = findById(review.getBook().getId());
+            book.deleteReview(review);
+            bookDao.update(book);
+        } catch (ReviewNotFoundException | BookNotFoundException e) {
+            result = false;
+        }
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public boolean updateReview(long reviewId, String updatedReviewText) {
+        boolean result = true;
+        try {
+            Review review = reviewDao.findById(reviewId);
+            review.setReview(updatedReviewText);
+            reviewDao.update(review);
+        } catch (ReviewNotFoundException e) {
+            result = false;
+        }
+        return result;
     }
 }
