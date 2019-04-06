@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import ru.otus.springlibrary.dao.GenreDao;
 import ru.otus.springlibrary.domain.Genre;

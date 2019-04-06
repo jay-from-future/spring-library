@@ -1,15 +1,13 @@
 package ru.otus.springlibrary.domain;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "REVIEW")
-@Setter
-@Getter
+@Data
 @NoArgsConstructor
 public class Review {
 

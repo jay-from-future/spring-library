@@ -1,16 +1,14 @@
 package ru.otus.springlibrary.domain;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "AUTHOR")
-@Setter
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @NamedQuery(name = "findAllAuthors", query = "select a from Author a")
@@ -42,3 +40,4 @@ public class Author {
         return firstName + " " + lastName;
     }
 }
+

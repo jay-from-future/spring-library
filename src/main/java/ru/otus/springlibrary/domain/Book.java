@@ -1,17 +1,13 @@
 package ru.otus.springlibrary.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @Table(name = "BOOK")
-@Setter
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @NamedQuery(name = "findAllBooks", query = "select b from Book b")
