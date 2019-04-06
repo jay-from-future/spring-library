@@ -31,6 +31,12 @@
         <junit.jupiter.version>5.3.2</junit.jupiter.version>
         <mockito.version>2.23.4</mockito.version>
         <guava.version>27.1-jre</guava.version>
+
+        <hibernate-entitymanager.version>5.4.2.Final</hibernate-entitymanager.version>
+        <hibernate-core.version>5.4.2.Final</hibernate-core.version>
+
+        <spring-tx.version>5.1.6.RELEASE</spring-tx.version>
+        <spring-orm.version>5.1.6.RELEASE</spring-orm.version>
     </properties>
 
     <dependencies>
@@ -39,8 +45,24 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>${spring-orm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>${spring-tx.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>${hibernate-core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>${hibernate-entitymanager.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
