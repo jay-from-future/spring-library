@@ -1,12 +1,14 @@
 package ru.otus.springlibrary.domain;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "BOOK")
+@Table(name = "book")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,26 +21,47 @@ public class Book {
     @Column(updatable = false)
     private long id;
 
-    @Column(name = "TITLE")
+    @Column(name = "title")
     private String title;
 
-    @OneToOne
-    private Author author;
 
-    @OneToOne
-    private Genre genre;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "map_book_author",
+            joinColumns = {@JoinColumn(name = "book_id")},
+            inverseJoinColumns = {@JoinColumn(name = "author_id")})
+    private List<Author> authors;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "map_book_genre",
+            joinColumns = {@JoinColumn(name = "book_id")},
+            inverseJoinColumns = {@JoinColumn(name = "genre_id")})
+    private List<Genre> genres;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "book", cascade = CascadeType.ALL)
     private List<Review> reviews;
 
-    public Book(String title, Author author, Genre genre) {
-        this.title = title;
-        this.author = author;
-        this.genre = genre;
-    }
-
     public Book(String title) {
         this.title = title;
+    }
+
+    public void addAuthor(Author author) {
+        authors.add(author);
+        author.addBook(this);
+    }
+
+    public void removeAuthor(Author author) {
+        authors.remove(author);
+        author.removeBook(this);
+    }
+
+    public void addGenre(Genre genre) {
+        genres.add(genre);
+        genre.addBook(this);
+    }
+
+    public void removeGenre(Genre genre) {
+        genres.remove(genre);
+        genre.removeBook(this);
     }
 
     public void addReview(Review review) {
@@ -49,15 +72,5 @@ public class Book {
     public void deleteReview(Review review) {
         reviews.remove(review);
         review.setBook(null);
-    }
-
-    @Override
-    public String toString() {
-        return "Book{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", author=" + author +
-                ", genre=" + genre +
-                '}';
     }
 }

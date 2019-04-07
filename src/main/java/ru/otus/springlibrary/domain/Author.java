@@ -5,9 +5,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
-@Table(name = "AUTHOR")
+@Table(name = "author")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,11 +21,17 @@ public class Author {
     @Column(updatable = false)
     private long id;
 
-    @Column(name = "FIRSTNAME")
+    @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "LASTNAME")
+    @Column(name = "last_name")
     private String lastName;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "map_book_author",
+            joinColumns = {@JoinColumn(name = "author_id")},
+            inverseJoinColumns = {@JoinColumn(name = "book_id")})
+    private List<Book> books;
 
     public Author(String firstName, String lastName) {
         this.firstName = firstName;
@@ -38,6 +45,14 @@ public class Author {
     @Override
     public String toString() {
         return firstName + " " + lastName;
+    }
+
+    public void addBook(Book book) {
+        books.add(book);
+    }
+
+    public void removeBook(Book book) {
+        books.remove(book);
     }
 }
 

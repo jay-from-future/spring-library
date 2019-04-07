@@ -25,10 +25,10 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
-    public boolean addGenre(String genre) {
+    public boolean addGenre(String genreText) {
         try {
-            // todo add check that genre existing or not before perform insert, otherwise id will be incremented for useless attempts
-            genreDao.insert(new Genre(genre));
+            Genre genre = new Genre(genreText);
+            genreDao.insert(genre);
             return true;
         } catch (DataIntegrityViolationException e) {
             logger.debug(e.getMessage());

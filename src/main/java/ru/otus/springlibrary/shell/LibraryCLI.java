@@ -43,6 +43,8 @@ public class LibraryCLI {
 
     private static final String SUCCESSFULLY_DELETED = "%s item with id = %d successfully deleted";
 
+    private static final int DEFAULT_WIDTH = 80;
+
     private final BookService bookService;
 
     private final AuthorService authorService;
@@ -54,8 +56,8 @@ public class LibraryCLI {
     public Table showBookReviews(@ShellOption long bookId) {
         try {
             Book book = bookService.findById(bookId);
-            System.out.println(String.format("%d | %s | %s | %s", book.getId(), book.getTitle(), book.getAuthor(),
-                    book.getGenre()));
+            // todo print authors and genres
+            System.out.println(String.format("%d | %s", book.getId(), book.getTitle()));
             LinkedHashMap<String, Object> headers = new LinkedHashMap<>();
             headers.put("id", "Id");
             headers.put("review", "Review");
@@ -106,15 +108,17 @@ public class LibraryCLI {
     }
 
     @ShellMethod("Show all books")
-    public Table showAllBooks() {
+    @Transactional
+    public String showAllBooks() {
         List<Book> allBooks = bookService.getAllBooks();
         LinkedHashMap<String, Object> headers = new LinkedHashMap<>();
         headers.put("id", "Id");
         headers.put("title", "Title");
-        headers.put("author", "Author");
-        headers.put("genre", "Genre");
+        headers.put("authors", "Authors");
+        headers.put("genres", "Genres");
         BeanListTableModel model = new BeanListTableModel<>(allBooks, headers);
-        return wrapInTable(model);
+        // it is needed to render table here, otherwise you'll get LazyInitializationException
+        return wrapInTable(model).render(DEFAULT_WIDTH);
     }
 
     @ShellMethod("Show all authors")
@@ -148,6 +152,7 @@ public class LibraryCLI {
     public void addBook(@ShellOption String title,
                         @ShellOption long authorId,
                         @ShellOption long genreId) {
+        // todo many authors and genres -> rewrite!
         printResult(bookService.addBook(title, authorId, genreId), BOOK);
     }
 

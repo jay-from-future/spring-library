@@ -6,7 +6,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.otus.springlibrary.dao.AuthorDao;
 import ru.otus.springlibrary.dao.BookDao;
+import ru.otus.springlibrary.dao.GenreDao;
 import ru.otus.springlibrary.dao.ReviewDao;
 import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.domain.Book;
@@ -25,6 +27,10 @@ public class BookServiceImpl implements BookService {
 
     private final BookDao bookDao;
 
+    private final AuthorDao authorDao;
+
+    private final GenreDao genreDao;
+
     private final ReviewDao reviewDao;
 
     @Override
@@ -35,8 +41,16 @@ public class BookServiceImpl implements BookService {
     @Override
     public boolean addBook(String title, long authorId, long genreId) {
         try {
-            // todo add check that book existing or not before perform insert, otherwise id will be incremented for useless attempts
-            bookDao.insert(new Book(title, new Author(authorId), new Genre(genreId)));
+            Author author = new Author(authorId);
+            authorDao.insert(author);
+
+            Genre genre = new Genre(genreId);
+            genreDao.insert(genre);
+
+            Book book = new Book(title);
+            book.addAuthor(author);
+            book.addGenre(genre);
+            bookDao.insert(book);
             return true;
         } catch (DataIntegrityViolationException e) {
             logger.debug(e.getMessage());

@@ -27,8 +27,8 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public boolean addAuthor(String firstName, String lastName) {
         try {
-            // todo add check that authot existing or not before perform insert, otherwise id will be incremented for useless attempts
-            authorDao.insert(new Author(firstName, lastName));
+            Author author = new Author(firstName, lastName);
+            authorDao.insert(author);
             return true;
         } catch (DataIntegrityViolationException e) {
             logger.debug(e.getMessage());

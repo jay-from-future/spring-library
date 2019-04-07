@@ -57,14 +57,15 @@ class BookServiceImplTest {
 
     @BeforeEach
     void setUp() throws AuthorNotFoundException, GenreNotFoundException, BookNotFoundException, ReviewNotFoundException {
-        Author author = new Author(1, "test first name", "test last name");
-        Genre genre = new Genre(1, "test genre");
+        Author author = new Author(1, "test first name", "test last name", new ArrayList<>());
+        Genre genre = new Genre(1, "test genre", new ArrayList<>());
 
         Review review = new Review(TEST_REVIEW);
         ArrayList<Review> reviews = new ArrayList<>();
         reviews.add(review);
 
-        Book book = new Book(1, TEST_TITLE, author, genre, reviews);
+        Book book = new Book(1, TEST_TITLE, Collections.singletonList(author), Collections.singletonList(genre),
+                reviews);
         review.setBook(book);
 
         when(bookDao.getAllBooks()).thenReturn(Collections.singletonList(book));

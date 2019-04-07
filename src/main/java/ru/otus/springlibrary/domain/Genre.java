@@ -1,11 +1,14 @@
 package ru.otus.springlibrary.domain;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
-@Table(name = "GENRE")
+@Table(name = "genre")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,8 +21,14 @@ public class Genre {
     @Column(updatable = false)
     private long id;
 
-    @Column(name = "GENRE")
+    @Column(name = "genre")
     private String genre;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "map_book_genre",
+            joinColumns = {@JoinColumn(name = "genre_id")},
+            inverseJoinColumns = {@JoinColumn(name = "book_id")})
+    private List<Book> books;
 
     public Genre(String genre) {
         this.genre = genre;
@@ -32,5 +41,13 @@ public class Genre {
     @Override
     public String toString() {
         return genre;
+    }
+
+    public void addBook(Book book) {
+        books.add(book);
+    }
+
+    public void removeBook(Book book) {
+        books.remove(book);
     }
 }

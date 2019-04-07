@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "REVIEW")
+@Table(name = "review")
 @Data
 @NoArgsConstructor
 public class Review {
@@ -17,11 +17,11 @@ public class Review {
     @Column(updatable = false)
     private long id;
 
-    @Column(name = "REVIEW_TEXT")
+    @Column(name = "review_text")
     private String review;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "BOOK_ID", nullable = false)
+    @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
     public Review(String review) {

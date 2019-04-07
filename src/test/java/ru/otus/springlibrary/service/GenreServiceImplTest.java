@@ -12,6 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.otus.springlibrary.dao.GenreDao;
 import ru.otus.springlibrary.domain.Genre;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,7 +36,7 @@ class GenreServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        Genre genre = new Genre(1, TEST_GENRE);
+        Genre genre = new Genre(1, TEST_GENRE, new ArrayList<>());
         when(genreDao.getAllGenres()).thenReturn(Collections.singletonList(genre));
     }
 

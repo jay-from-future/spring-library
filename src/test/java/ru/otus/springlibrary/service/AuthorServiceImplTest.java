@@ -12,6 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.otus.springlibrary.dao.AuthorDao;
 import ru.otus.springlibrary.domain.Author;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,7 +39,7 @@ class AuthorServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        Author author = new Author(1, FIRST_NAME, LAST_NAME);
+        Author author = new Author(1, FIRST_NAME, LAST_NAME, new ArrayList<>());
         when(authorDao.getAllAuthors()).thenReturn(Collections.singletonList(author));
     }
 
