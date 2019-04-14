@@ -5,7 +5,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,13 +39,6 @@ class GenreDaoImplTest {
         List<Genre> allGenres = genreDao.getAllGenres();
         assertFalse(allGenres.isEmpty());
     }
-
-    // todo fix test
-//    @Test
-//    void deleteGenreWithExistingReferenceToBook() throws GenreNotFoundException {
-//        Genre genreWithReferenceToBook = genreDao.findById(EXISTING_GENRE_WITH_BOOK_REFERENCE_ID);
-//        assertTrue(genreDao.delete(genreWithReferenceToBook));
-//    }
 
     @Test
     void delete() {

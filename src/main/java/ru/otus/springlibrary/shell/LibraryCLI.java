@@ -56,8 +56,8 @@ public class LibraryCLI {
     public Table showBookReviews(@ShellOption long bookId) {
         try {
             Book book = bookService.findById(bookId);
-            // todo print authors and genres
-            System.out.println(String.format("%d | %s", book.getId(), book.getTitle()));
+            System.out.println(String.format("%d | %s | %s | %s", book.getId(), book.getTitle(), book.getAuthors(),
+                    book.getGenres()));
             LinkedHashMap<String, Object> headers = new LinkedHashMap<>();
             headers.put("id", "Id");
             headers.put("review", "Review");
@@ -150,10 +150,9 @@ public class LibraryCLI {
 
     @ShellMethod("Add new book")
     public void addBook(@ShellOption String title,
-                        @ShellOption long authorId,
-                        @ShellOption long genreId) {
-        // todo many authors and genres -> rewrite!
-        printResult(bookService.addBook(title, authorId, genreId), BOOK);
+                        @ShellOption List<Long> authorIDs,
+                        @ShellOption List<Long> genreIDs) {
+        printResult(bookService.addBook(title, authorIDs, genreIDs), BOOK);
     }
 
     @ShellMethod("Add new genre")

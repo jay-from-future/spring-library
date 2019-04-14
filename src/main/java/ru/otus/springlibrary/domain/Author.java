@@ -27,7 +27,7 @@ public class Author {
     @Column(name = "last_name")
     private String lastName;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "map_book_author",
             joinColumns = {@JoinColumn(name = "author_id")},
             inverseJoinColumns = {@JoinColumn(name = "book_id")})
@@ -47,12 +47,5 @@ public class Author {
         return firstName + " " + lastName;
     }
 
-    public void addBook(Book book) {
-        books.add(book);
-    }
-
-    public void removeBook(Book book) {
-        books.remove(book);
-    }
 }
 

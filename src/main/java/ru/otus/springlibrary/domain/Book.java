@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,20 +25,19 @@ public class Book {
     @Column(name = "title")
     private String title;
 
-
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "map_book_author",
             joinColumns = {@JoinColumn(name = "book_id")},
             inverseJoinColumns = {@JoinColumn(name = "author_id")})
     private List<Author> authors;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "map_book_genre",
             joinColumns = {@JoinColumn(name = "book_id")},
             inverseJoinColumns = {@JoinColumn(name = "genre_id")})
     private List<Genre> genres;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "book", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "book", cascade = CascadeType.REMOVE)
     private List<Review> reviews;
 
     public Book(String title) {
@@ -45,23 +45,25 @@ public class Book {
     }
 
     public void addAuthor(Author author) {
+        if (authors == null) {
+            authors = new ArrayList<>();
+        }
         authors.add(author);
-        author.addBook(this);
     }
 
     public void removeAuthor(Author author) {
         authors.remove(author);
-        author.removeBook(this);
     }
 
     public void addGenre(Genre genre) {
+        if (genres == null) {
+            genres = new ArrayList<>();
+        }
         genres.add(genre);
-        genre.addBook(this);
     }
 
     public void removeGenre(Genre genre) {
         genres.remove(genre);
-        genre.removeBook(this);
     }
 
     public void addReview(Review review) {

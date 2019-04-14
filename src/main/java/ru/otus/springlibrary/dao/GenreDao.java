@@ -22,9 +22,8 @@ public interface GenreDao {
      *
      * @param id unique id in database
      * @return {@link Genre} entity
-     * @throws GenreNotFoundException if genre with such id was not found
      */
-    Genre findById(long id) throws GenreNotFoundException;
+    Genre findById(long id);
 
     /**
      * Updates {@link Genre} entity in database

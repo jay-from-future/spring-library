@@ -25,7 +25,7 @@ public class GenreDaoImpl implements GenreDao {
     }
 
     @Override
-    public Genre findById(long id) throws GenreNotFoundException {
+    public Genre findById(long id) {
         Genre genre = genericDao.findById(Genre.class, id);
         if (genre == null) {
             throw new GenreNotFoundException();

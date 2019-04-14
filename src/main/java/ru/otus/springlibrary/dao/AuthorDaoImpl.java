@@ -25,7 +25,7 @@ public class AuthorDaoImpl implements AuthorDao {
     }
 
     @Override
-    public Author findById(long id) throws AuthorNotFoundException {
+    public Author findById(long id) {
         Author author = genericDao.findById(Author.class, id);
         if (author == null) {
             throw new AuthorNotFoundException();

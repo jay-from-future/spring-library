@@ -1,5 +1,5 @@
 package ru.otus.springlibrary.exception;
 
-public class GenreNotFoundException extends Exception {
+public class GenreNotFoundException extends RuntimeException {
 
 }

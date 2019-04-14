@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.springlibrary.dao.GenreDao;
 import ru.otus.springlibrary.domain.Genre;
 import ru.otus.springlibrary.exception.GenreNotFoundException;
@@ -37,9 +38,11 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
+    @Transactional
     public boolean delete(long id) {
         try {
             Genre genre = genreDao.findById(id);
+            genre.getBooks().forEach(b -> b.removeGenre(genre));
             genreDao.delete(genre);
         } catch (GenreNotFoundException | DataIntegrityViolationException e) {
             logger.debug("Cannot remove genre with id = " + id, e);

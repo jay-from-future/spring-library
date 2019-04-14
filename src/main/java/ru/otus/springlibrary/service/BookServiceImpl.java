@@ -14,10 +14,13 @@ import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.domain.Book;
 import ru.otus.springlibrary.domain.Genre;
 import ru.otus.springlibrary.domain.Review;
+import ru.otus.springlibrary.exception.AuthorNotFoundException;
 import ru.otus.springlibrary.exception.BookNotFoundException;
+import ru.otus.springlibrary.exception.GenreNotFoundException;
 import ru.otus.springlibrary.exception.ReviewNotFoundException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,30 +42,48 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public boolean addBook(String title, long authorId, long genreId) {
+    @Transactional
+    public boolean addBook(String title, List<Long> authorIDs, List<Long> genreIDs) {
         try {
-            Author author = new Author(authorId);
-            authorDao.insert(author);
-
-            Genre genre = new Genre(genreId);
-            genreDao.insert(genre);
-
             Book book = new Book(title);
-            book.addAuthor(author);
-            book.addGenre(genre);
+
+            List<Author> authors = authorIDs.stream().map(authorDao::findById).collect(Collectors.toList());
+            authors.forEach(book::addAuthor);
+
+            List<Genre> genres = genreIDs.stream().map(genreDao::findById).collect(Collectors.toList());
+            genres.forEach(book::addGenre);
+
             bookDao.insert(book);
             return true;
-        } catch (DataIntegrityViolationException e) {
+        } catch (DataIntegrityViolationException | AuthorNotFoundException | GenreNotFoundException e) {
             logger.debug(e.getMessage());
         }
         return false;
     }
 
     @Override
+    @Transactional
     public boolean delete(long id) {
         try {
             Book book = bookDao.findById(id);
             bookDao.delete(book);
+
+            List<Author> authors = book.getAuthors();
+            for (Author a : authors) {
+                List<Book> books = a.getBooks();
+                if (books.contains(book) && books.size() == 1) {
+                    authorDao.delete(a);
+                }
+            }
+
+            List<Genre> genres = book.getGenres();
+            for (Genre g : genres) {
+                List<Book> books = g.getBooks();
+                if (books.contains(book) && books.size() == 1) {
+                    genreDao.delete(g);
+                }
+            }
+
         } catch (BookNotFoundException | DataIntegrityViolationException e) {
             logger.debug("Cannot remove book with id = " + id, e);
             return false;

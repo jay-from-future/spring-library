@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.springlibrary.dao.AuthorDao;
 import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.exception.AuthorNotFoundException;
@@ -37,9 +38,11 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    @Transactional
     public boolean delete(long id) {
         try {
             Author author = authorDao.findById(id);
+            author.getBooks().forEach(b -> b.removeAuthor(author));
             authorDao.delete(author);
         } catch (AuthorNotFoundException | DataIntegrityViolationException e) {
             logger.debug("Cannot remove author with id = " + id, e);

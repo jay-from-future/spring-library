@@ -24,7 +24,7 @@ public class Genre {
     @Column(name = "genre")
     private String genre;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "map_book_genre",
             joinColumns = {@JoinColumn(name = "genre_id")},
             inverseJoinColumns = {@JoinColumn(name = "book_id")})
@@ -43,11 +43,4 @@ public class Genre {
         return genre;
     }
 
-    public void addBook(Book book) {
-        books.add(book);
-    }
-
-    public void removeBook(Book book) {
-        books.remove(book);
-    }
 }

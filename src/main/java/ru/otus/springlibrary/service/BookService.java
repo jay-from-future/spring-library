@@ -20,12 +20,12 @@ public interface BookService {
     /**
      * Adds new book into library
      *
-     * @param title    book title
-     * @param authorId book author id
-     * @param genreId  book genre id
+     * @param title     book title
+     * @param authorIDs list of book author IDs
+     * @param genreIDs  list of book genre IDs
      * @return true - if book has been added, false - if book already exists
      */
-    boolean addBook(String title, long authorId, long genreId);
+    boolean addBook(String title, List<Long> authorIDs, List<Long> genreIDs);
 
     /**
      * Deletes book with such id

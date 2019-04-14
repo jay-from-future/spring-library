@@ -1,9 +1,9 @@
 package ru.otus.springlibrary.dao;
 
 import ru.otus.springlibrary.domain.Author;
-import ru.otus.springlibrary.exception.AuthorNotFoundException;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * DAO implementation for {@link Author} entity.
@@ -22,9 +22,8 @@ public interface AuthorDao {
      *
      * @param id unique id in database
      * @return {@link Author} entity
-     * @throws AuthorNotFoundException if author with such id was not found
      */
-    Author findById(long id) throws AuthorNotFoundException;
+    Author findById(long id);
 
     /**
      * Updates {@link Author} entity in database
