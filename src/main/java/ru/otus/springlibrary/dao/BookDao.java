@@ -1,7 +1,7 @@
 package ru.otus.springlibrary.dao;
 
-import ru.otus.springlibrary.exception.BookNotFoundException;
 import ru.otus.springlibrary.domain.Book;
+import ru.otus.springlibrary.exception.BookNotFoundException;
 
 import java.util.List;
 
@@ -13,10 +13,9 @@ public interface BookDao {
     /**
      * Inserts {@link Book} entity into database.
      *
-     * @param book     {@link Book} entity that should be inserted
-     * @return {@link Book} entity filled with auto-generated id from database
+     * @param book {@link Book} entity that should be inserted
      */
-    Book insert(Book book);
+    void insert(Book book);
 
     /**
      * Finds {@link Book} entity by id.
@@ -31,17 +30,15 @@ public interface BookDao {
      * Updates {@link Book} entity in database
      *
      * @param book {@link Book} entity
-     * @return updated {@link Book} entity from the database
      */
-    Book update(Book book);
+    void update(Book book);
 
     /**
      * Deletes {@link Book} entity from database
      *
-     * @param id id of {@link Book} entity that should be deleted
-     * @return true if entity has been successfully deleted, otherwise - false
+     * @param book {@link Book} entity that should be deleted
      */
-    boolean delete(long id);
+    void delete(Book book);
 
     /**
      * Returns all {@link Book} entities from database.

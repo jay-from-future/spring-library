@@ -6,18 +6,18 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.shell.jline.InteractiveShellApplicationRunner;
 import org.springframework.shell.jline.ScriptShellApplicationRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.otus.springlibrary.dao.AuthorDao;
 import ru.otus.springlibrary.domain.Author;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -37,11 +37,9 @@ class AuthorServiceImplTest {
     @MockBean
     AuthorDao authorDao;
 
-    private Author author;
-
     @BeforeEach
     void setUp() {
-        author = new Author(1, FIRST_NAME, LAST_NAME);
+        Author author = new Author(1, FIRST_NAME, LAST_NAME, new ArrayList<>());
         when(authorDao.getAllAuthors()).thenReturn(Collections.singletonList(author));
     }
 
@@ -57,13 +55,7 @@ class AuthorServiceImplTest {
 
     @Test
     void addNewValidAuthor() {
-        when(authorDao.insert(any())).thenReturn(author);
         assertTrue(authorService.addAuthor(FIRST_NAME, LAST_NAME));
     }
 
-    @Test
-    void tryToAddAlreadyExistingAuthor() {
-        when(authorDao.insert(any())).thenThrow(DuplicateKeyException.class);
-        assertFalse(authorService.addAuthor(FIRST_NAME, LAST_NAME));
-    }
 }

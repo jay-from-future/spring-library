@@ -3,14 +3,24 @@ package ru.otus.springlibrary.service;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.otus.springlibrary.dao.AuthorDao;
 import ru.otus.springlibrary.dao.BookDao;
+import ru.otus.springlibrary.dao.GenreDao;
+import ru.otus.springlibrary.dao.ReviewDao;
 import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.domain.Book;
 import ru.otus.springlibrary.domain.Genre;
+import ru.otus.springlibrary.domain.Review;
+import ru.otus.springlibrary.exception.AuthorNotFoundException;
+import ru.otus.springlibrary.exception.BookNotFoundException;
+import ru.otus.springlibrary.exception.GenreNotFoundException;
+import ru.otus.springlibrary.exception.ReviewNotFoundException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,24 +30,117 @@ public class BookServiceImpl implements BookService {
 
     private final BookDao bookDao;
 
+    private final AuthorDao authorDao;
+
+    private final GenreDao genreDao;
+
+    private final ReviewDao reviewDao;
+
     @Override
     public List<Book> getAllBooks() {
         return bookDao.getAllBooks();
     }
 
     @Override
-    public boolean addBook(String title, long authorId, long genreId) {
+    @Transactional
+    public boolean addBook(String title, List<Long> authorIDs, List<Long> genreIDs) {
         try {
-            bookDao.insert(new Book(title, new Author(authorId), new Genre(genreId)));
+            Book book = new Book(title);
+
+            List<Author> authors = authorIDs.stream().map(authorDao::findById).collect(Collectors.toList());
+            authors.forEach(book::addAuthor);
+
+            List<Genre> genres = genreIDs.stream().map(genreDao::findById).collect(Collectors.toList());
+            genres.forEach(book::addGenre);
+
+            bookDao.insert(book);
             return true;
-        } catch (DuplicateKeyException e) {
+        } catch (DataIntegrityViolationException | AuthorNotFoundException | GenreNotFoundException e) {
             logger.debug(e.getMessage());
         }
         return false;
     }
 
     @Override
+    @Transactional
     public boolean delete(long id) {
-        return bookDao.delete(id);
+        try {
+            Book book = bookDao.findById(id);
+            bookDao.delete(book);
+
+            List<Author> authors = book.getAuthors();
+            for (Author a : authors) {
+                List<Book> books = a.getBooks();
+                if (books.contains(book) && books.size() == 1) {
+                    authorDao.delete(a);
+                }
+            }
+
+            List<Genre> genres = book.getGenres();
+            for (Genre g : genres) {
+                List<Book> books = g.getBooks();
+                if (books.contains(book) && books.size() == 1) {
+                    genreDao.delete(g);
+                }
+            }
+
+        } catch (BookNotFoundException | DataIntegrityViolationException e) {
+            logger.debug("Cannot remove book with id = " + id, e);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public Book findById(long id) throws BookNotFoundException {
+        return bookDao.findById(id);
+    }
+
+    @Override
+    @Transactional
+    public boolean addReview(long id, String reviewText) {
+        boolean result = true;
+        try {
+            Review review = new Review(reviewText);
+            reviewDao.insert(review);
+
+            Book book = findById(id);
+            book.addReview(review);
+            bookDao.update(book);
+        } catch (BookNotFoundException e) {
+            result = false;
+        }
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public boolean deleteReview(long reviewId) {
+        boolean result = true;
+        try {
+            Review review = reviewDao.findById(reviewId);
+            reviewDao.delete(review);
+
+            Book book = findById(review.getBook().getId());
+            book.deleteReview(review);
+            bookDao.update(book);
+        } catch (ReviewNotFoundException | BookNotFoundException e) {
+            result = false;
+        }
+        return result;
+    }
+
+    @Override
+    @Transactional
+    public boolean updateReview(long reviewId, String updatedReviewText) {
+        boolean result = true;
+        try {
+            Review review = reviewDao.findById(reviewId);
+            review.setReview(updatedReviewText);
+            reviewDao.update(review);
+        } catch (ReviewNotFoundException e) {
+            result = false;
+        }
+        return result;
     }
 }

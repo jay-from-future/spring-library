@@ -1,22 +1,33 @@
 package ru.otus.springlibrary.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Setter
-@Getter
+import javax.persistence.*;
+import java.util.List;
+
+@Entity
+@Table(name = "genre")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@NamedQuery(name = "findAllGenres", query = "select g from Genre g")
 public class Genre {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "genre_generator")
+    @SequenceGenerator(name = "genre_generator", sequenceName = "genre_sequence", allocationSize = 1)
+    @Column(updatable = false)
     private long id;
 
+    @Column(name = "genre")
     private String genre;
 
-    public Genre(String genre) {
-        this.genre = genre;
-    }
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "genres")
+    private List<Book> books;
 
-    public Genre(long id, String genre) {
-        this.id = id;
+    public Genre(String genre) {
         this.genre = genre;
     }
 
@@ -28,4 +39,5 @@ public class Genre {
     public String toString() {
         return genre;
     }
+
 }
