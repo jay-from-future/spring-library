@@ -85,4 +85,21 @@ class AuthorDaoImplTest {
         List<Author> allAuthors = authorDao.getAllAuthors();
         assertFalse(allAuthors.isEmpty());
     }
+
+    @Test
+    void delete() {
+        String firstName = "test new author first name for delete";
+        String lastName = "test new author last name for delete";
+        Author author = new Author(firstName, lastName);
+        authorDao.insert(author);
+
+        long id = author.getId();
+        assertFalse(id == 0);
+        assertEquals(firstName, author.getFirstName());
+        assertEquals(lastName, author.getLastName());
+
+        authorDao.delete(author);
+
+        assertThrows(AuthorNotFoundException.class, () -> authorDao.findById(id));
+    }
 }

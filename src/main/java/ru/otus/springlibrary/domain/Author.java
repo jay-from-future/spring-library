@@ -27,10 +27,7 @@ public class Author {
     @Column(name = "last_name")
     private String lastName;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "map_book_author",
-            joinColumns = {@JoinColumn(name = "author_id")},
-            inverseJoinColumns = {@JoinColumn(name = "book_id")})
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "authors")
     private List<Book> books;
 
     public Author(String firstName, String lastName) {

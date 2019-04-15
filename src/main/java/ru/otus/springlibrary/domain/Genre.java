@@ -24,10 +24,7 @@ public class Genre {
     @Column(name = "genre")
     private String genre;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "map_book_genre",
-            joinColumns = {@JoinColumn(name = "genre_id")},
-            inverseJoinColumns = {@JoinColumn(name = "book_id")})
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "genres")
     private List<Book> books;
 
     public Genre(String genre) {
