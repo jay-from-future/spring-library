@@ -1,6 +1,7 @@
 package ru.otus.springlibrary.service;
 
 import ru.otus.springlibrary.domain.Book;
+import ru.otus.springlibrary.domain.Review;
 import ru.otus.springlibrary.exception.BookNotFoundException;
 
 import java.util.List;
@@ -13,9 +14,9 @@ public interface BookService {
     /**
      * Returns all books from the database
      *
-     * @return list of books
+     * @return books
      */
-    List<Book> getAllBooks();
+    Iterable<Book> findAll();
 
     /**
      * Adds new book into library
@@ -23,17 +24,16 @@ public interface BookService {
      * @param title     book title
      * @param authorIDs list of book author IDs
      * @param genreIDs  list of book genre IDs
-     * @return true - if book has been added, false - if book already exists
+     * @return added book
      */
-    boolean addBook(String title, List<Long> authorIDs, List<Long> genreIDs);
+    Book addBook(String title, List<Long> authorIDs, List<Long> genreIDs);
 
     /**
      * Deletes book with such id
      *
      * @param id book id
-     * @return true - if book has been deleted, false - if book does not exist
      */
-    boolean delete(long id);
+    void delete(long id);
 
     /**
      * Finds book by id.
@@ -49,24 +49,22 @@ public interface BookService {
      *
      * @param id         book id
      * @param reviewText review text
-     * @return true if review comment has been successfully added, otherwise - false.
+     * @return added review
      */
-    boolean addReview(long id, String reviewText);
+    Review addReview(long id, String reviewText);
 
     /**
      * Deletes review comment if exists.
      *
      * @param reviewId review id
-     * @return true if review comment has been successfully removed, otherwise - false.
      */
-    boolean deleteReview(long reviewId);
+    void deleteReview(long reviewId);
 
     /**
      * Updates review comment if exists.
      *
      * @param reviewId          review id
      * @param updatedReviewText updated review text
-     * @return true if review comment has been successfully updated, otherwise - false.
      */
-    boolean updateReview(long reviewId, String updatedReviewText);
+    void updateReview(long reviewId, String updatedReviewText);
 }

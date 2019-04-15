@@ -9,14 +9,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.shell.jline.InteractiveShellApplicationRunner;
 import org.springframework.shell.jline.ScriptShellApplicationRunner;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.otus.springlibrary.dao.GenreDao;
 import ru.otus.springlibrary.domain.Genre;
+import ru.otus.springlibrary.repository.GenreRepository;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.Iterator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -32,20 +33,20 @@ class GenreServiceImplTest {
     GenreService genreService;
 
     @MockBean
-    GenreDao genreDao;
+    GenreRepository genreRepository;
 
     @BeforeEach
     void setUp() {
         Genre genre = new Genre(1, TEST_GENRE, new ArrayList<>());
-        when(genreDao.getAllGenres()).thenReturn(Collections.singletonList(genre));
+        when(genreRepository.findAll()).thenReturn(Collections.singletonList(genre));
     }
 
     @Test
     void getAllGenres() {
-        List<Genre> allGenres = genreService.getAllGenres();
+        Iterator<Genre> allGenres = genreService.findAll().iterator();
 
-        assertEquals(1, allGenres.size());
-        Genre actual = allGenres.get(0);
+        assertTrue(allGenres.hasNext());
+        Genre actual = allGenres.next();
         assertEquals(TEST_GENRE, actual.getGenre());
     }
 }

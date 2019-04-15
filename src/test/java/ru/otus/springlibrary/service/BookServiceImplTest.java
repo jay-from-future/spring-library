@@ -9,10 +9,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.shell.jline.InteractiveShellApplicationRunner;
 import org.springframework.shell.jline.ScriptShellApplicationRunner;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.otus.springlibrary.dao.AuthorDao;
-import ru.otus.springlibrary.dao.BookDao;
-import ru.otus.springlibrary.dao.GenreDao;
-import ru.otus.springlibrary.dao.ReviewDao;
 import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.domain.Book;
 import ru.otus.springlibrary.domain.Genre;
@@ -21,11 +17,12 @@ import ru.otus.springlibrary.exception.AuthorNotFoundException;
 import ru.otus.springlibrary.exception.BookNotFoundException;
 import ru.otus.springlibrary.exception.GenreNotFoundException;
 import ru.otus.springlibrary.exception.ReviewNotFoundException;
+import ru.otus.springlibrary.repository.AuthorRepository;
+import ru.otus.springlibrary.repository.BookRepository;
+import ru.otus.springlibrary.repository.GenreRepository;
+import ru.otus.springlibrary.repository.ReviewRepository;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -45,19 +42,19 @@ class BookServiceImplTest {
     BookService bookService;
 
     @MockBean
-    BookDao bookDao;
+    BookRepository bookRepository;
 
     @MockBean
-    AuthorDao authorDao;
+    AuthorRepository authorRepository;
 
     @MockBean
-    GenreDao genreDao;
+    GenreRepository genreRepository;
 
     @MockBean
-    ReviewDao reviewDao;
+    ReviewRepository reviewRepository;
 
     @BeforeEach
-    void setUp() throws AuthorNotFoundException, GenreNotFoundException, BookNotFoundException, ReviewNotFoundException {
+    void setUp() throws AuthorNotFoundException, GenreNotFoundException, ReviewNotFoundException {
         Author author1 = new Author(1, "test first name 1", "test last name 1", new ArrayList<>());
         Author author2 = new Author(2, "test first name 2", "test last name 2", new ArrayList<>());
 
@@ -72,49 +69,49 @@ class BookServiceImplTest {
                 reviews);
         review.setBook(book);
 
-        when(bookDao.getAllBooks()).thenReturn(Collections.singletonList(book));
+        when(bookRepository.findAll()).thenReturn(Collections.singletonList(book));
 
         // existing items
-        when(authorDao.findById(1)).thenReturn(author1);
-        when(authorDao.findById(2)).thenReturn(author2);
+        when(authorRepository.findById(1L)).thenReturn(Optional.of(author1));
+        when(authorRepository.findById(2L)).thenReturn(Optional.of(author2));
 
-        when(genreDao.findById(1)).thenReturn(genre1);
-        when(genreDao.findById(2)).thenReturn(genre2);
+        when(genreRepository.findById(1L)).thenReturn(Optional.of(genre1));
+        when(genreRepository.findById(2L)).thenReturn(Optional.of(genre2));
 
-        when(reviewDao.findById(1)).thenReturn(review);
-        when(bookDao.findById(1)).thenReturn(book);
+        when(reviewRepository.findById(1L)).thenReturn(Optional.of(review));
+        when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
 
         // items that does not exist
-        when(bookDao.findById(2)).thenThrow(BookNotFoundException.class);
-        when(reviewDao.findById(2)).thenThrow(ReviewNotFoundException.class);
+        when(bookRepository.findById(2L)).thenThrow(BookNotFoundException.class);
+        when(reviewRepository.findById(2L)).thenThrow(ReviewNotFoundException.class);
     }
 
     @Test
     void addReview() {
-        assertTrue(bookService.addReview(1, TEST_REVIEW));
+        assertDoesNotThrow(() -> bookService.addReview(1, TEST_REVIEW));
     }
 
     @Test
     void addReviewIfBookDoesNotExist() {
-        assertFalse(bookService.addReview(2, TEST_REVIEW));
+        assertThrows(BookNotFoundException.class, () -> bookService.addReview(2, TEST_REVIEW));
     }
 
     @Test
     void deleteReview() {
-        assertTrue(bookService.deleteReview(1));
+        assertDoesNotThrow(() -> bookService.deleteReview(1));
     }
 
     @Test
     void deleteReviewIfReviewDoesNotExist() {
-        assertFalse(bookService.deleteReview(2));
+        assertThrows(ReviewNotFoundException.class, () -> bookService.deleteReview(2));
     }
 
     @Test
     void getAllBooks() {
-        List<Book> allBooks = bookService.getAllBooks();
+        Iterator<Book> allBooks = bookService.findAll().iterator();
 
-        assertEquals(1, allBooks.size());
-        Book actual = allBooks.get(0);
+        assertTrue(allBooks.hasNext());
+        Book actual = allBooks.next();
         assertEquals(TEST_TITLE, actual.getTitle());
     }
 
@@ -123,14 +120,12 @@ class BookServiceImplTest {
         List<Long> authorIDs = Arrays.asList(1L, 2L);
         List<Long> genreIDs = Arrays.asList(1L, 2L);
         String title = "add new book test title";
-        boolean result = bookService.addBook(title, authorIDs, genreIDs);
 
-        // check that book has been successfully added
-        assertTrue(result);
+        assertDoesNotThrow(() -> bookService.addBook(title, authorIDs, genreIDs));
     }
 
     @Test
     void removeBookWithAuthorAndGenre() {
-        assertTrue(bookService.delete(1));
+        assertDoesNotThrow(() -> bookService.delete(1));
     }
 }
