@@ -9,15 +9,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.shell.jline.InteractiveShellApplicationRunner;
 import org.springframework.shell.jline.ScriptShellApplicationRunner;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.otus.springlibrary.dao.AuthorDao;
 import ru.otus.springlibrary.domain.Author;
+import ru.otus.springlibrary.repository.AuthorRepository;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.Iterator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
@@ -35,27 +34,27 @@ class AuthorServiceImplTest {
     AuthorService authorService;
 
     @MockBean
-    AuthorDao authorDao;
+    AuthorRepository authorRepository;
 
     @BeforeEach
     void setUp() {
         Author author = new Author(1, FIRST_NAME, LAST_NAME, new ArrayList<>());
-        when(authorDao.getAllAuthors()).thenReturn(Collections.singletonList(author));
+        when(authorRepository.findAll()).thenReturn(Collections.singletonList(author));
     }
 
     @Test
     void getAllAuthors() {
-        List<Author> allAuthors = authorService.getAllAuthors();
+        Iterator<Author> allAuthors = authorService.findAll().iterator();
 
-        assertEquals(1, allAuthors.size());
-        Author author = allAuthors.get(0);
+        assertTrue(allAuthors.hasNext());
+        Author author = allAuthors.next();
         assertEquals(FIRST_NAME, author.getFirstName());
         assertEquals(LAST_NAME, author.getLastName());
     }
 
     @Test
     void addNewValidAuthor() {
-        assertTrue(authorService.addAuthor(FIRST_NAME, LAST_NAME));
+        assertDoesNotThrow(() -> authorService.addAuthor(FIRST_NAME, LAST_NAME));
     }
 
 }

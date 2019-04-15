@@ -1,23 +1,19 @@
 package ru.otus.springlibrary.service;
 
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.otus.springlibrary.dao.AuthorDao;
-import ru.otus.springlibrary.dao.BookDao;
-import ru.otus.springlibrary.dao.GenreDao;
-import ru.otus.springlibrary.dao.ReviewDao;
 import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.domain.Book;
 import ru.otus.springlibrary.domain.Genre;
 import ru.otus.springlibrary.domain.Review;
-import ru.otus.springlibrary.exception.AuthorNotFoundException;
 import ru.otus.springlibrary.exception.BookNotFoundException;
-import ru.otus.springlibrary.exception.GenreNotFoundException;
 import ru.otus.springlibrary.exception.ReviewNotFoundException;
+import ru.otus.springlibrary.repository.AuthorRepository;
+import ru.otus.springlibrary.repository.BookRepository;
+import ru.otus.springlibrary.repository.GenreRepository;
+import ru.otus.springlibrary.repository.ReviewRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,121 +22,91 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BookServiceImpl implements BookService {
 
-    private static final Logger logger = LoggerFactory.getLogger(BookServiceImpl.class);
+    private final BookRepository bookRepository;
 
-    private final BookDao bookDao;
+    private final AuthorRepository authorRepository;
 
-    private final AuthorDao authorDao;
+    private final GenreRepository genreRepository;
 
-    private final GenreDao genreDao;
-
-    private final ReviewDao reviewDao;
+    private final ReviewRepository reviewRepository;
 
     @Override
-    public List<Book> getAllBooks() {
-        return bookDao.getAllBooks();
+    public Iterable<Book> findAll() {
+        return bookRepository.findAll();
     }
 
     @Override
     @Transactional
-    public boolean addBook(String title, List<Long> authorIDs, List<Long> genreIDs) {
-        try {
-            Book book = new Book(title);
+    public Book addBook(String title, List<Long> authorIDs, List<Long> genreIDs) {
+        Book book = new Book(title);
 
-            List<Author> authors = authorIDs.stream().map(authorDao::findById).collect(Collectors.toList());
-            authors.forEach(book::addAuthor);
+        List<Author> authors = convertIDsToEntities(authorIDs, authorRepository);
+        authors.forEach(book::addAuthor);
 
-            List<Genre> genres = genreIDs.stream().map(genreDao::findById).collect(Collectors.toList());
-            genres.forEach(book::addGenre);
+        List<Genre> genres = convertIDsToEntities(genreIDs, genreRepository);
+        genres.forEach(book::addGenre);
 
-            bookDao.insert(book);
-            return true;
-        } catch (DataIntegrityViolationException | AuthorNotFoundException | GenreNotFoundException e) {
-            logger.debug(e.getMessage());
-        }
-        return false;
+        return bookRepository.save(book);
     }
 
     @Override
     @Transactional
-    public boolean delete(long id) {
-        try {
-            Book book = bookDao.findById(id);
-            bookDao.delete(book);
+    public void delete(long id) {
+        Book book = bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
+        bookRepository.delete(book);
 
-            List<Author> authors = book.getAuthors();
-            for (Author a : authors) {
-                List<Book> books = a.getBooks();
-                if (books.contains(book) && books.size() == 1) {
-                    authorDao.delete(a);
-                }
+        List<Author> authors = book.getAuthors();
+        for (Author a : authors) {
+            List<Book> books = a.getBooks();
+            if (books.contains(book) && books.size() == 1) {
+                authorRepository.delete(a);
             }
+        }
 
-            List<Genre> genres = book.getGenres();
-            for (Genre g : genres) {
-                List<Book> books = g.getBooks();
-                if (books.contains(book) && books.size() == 1) {
-                    genreDao.delete(g);
-                }
+        List<Genre> genres = book.getGenres();
+        for (Genre g : genres) {
+            List<Book> books = g.getBooks();
+            if (books.contains(book) && books.size() == 1) {
+                genreRepository.delete(g);
             }
-
-        } catch (BookNotFoundException | DataIntegrityViolationException e) {
-            logger.debug("Cannot remove book with id = " + id, e);
-            return false;
         }
-        return true;
     }
 
     @Override
-    public Book findById(long id) throws BookNotFoundException {
-        return bookDao.findById(id);
+    public Book findById(long id) {
+        return bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
     }
 
     @Override
     @Transactional
-    public boolean addReview(long id, String reviewText) {
-        boolean result = true;
-        try {
-            Review review = new Review(reviewText);
-            reviewDao.insert(review);
+    public Review addReview(long id, String reviewText) {
+        Review review = new Review(reviewText);
+        Review savedReview = reviewRepository.save(review);
 
-            Book book = findById(id);
-            book.addReview(review);
-            bookDao.update(book);
-        } catch (BookNotFoundException e) {
-            result = false;
-        }
-        return result;
+        Book book = findById(id);
+        book.addReview(review);
+        bookRepository.save(book);
+
+        return savedReview;
     }
 
     @Override
-    @Transactional
-    public boolean deleteReview(long reviewId) {
-        boolean result = true;
-        try {
-            Review review = reviewDao.findById(reviewId);
-            reviewDao.delete(review);
-
-            Book book = findById(review.getBook().getId());
-            book.deleteReview(review);
-            bookDao.update(book);
-        } catch (ReviewNotFoundException | BookNotFoundException e) {
-            result = false;
-        }
-        return result;
+    public void deleteReview(long reviewId) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
+        reviewRepository.delete(review);
     }
 
     @Override
-    @Transactional
-    public boolean updateReview(long reviewId, String updatedReviewText) {
-        boolean result = true;
-        try {
-            Review review = reviewDao.findById(reviewId);
-            review.setReview(updatedReviewText);
-            reviewDao.update(review);
-        } catch (ReviewNotFoundException e) {
-            result = false;
-        }
-        return result;
+    public void updateReview(long reviewId, String updatedReviewText) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
+        review.setReview(updatedReviewText);
+        reviewRepository.save(review);
+    }
+
+    private <T> List<T> convertIDsToEntities(List<Long> ids, CrudRepository<T, Long> repository) {
+        return ids.stream()
+                .filter(repository::existsById)
+                .map(id -> repository.findById(id).orElseThrow())
+                .collect(Collectors.toList());
     }
 }

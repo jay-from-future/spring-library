@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.domain.Book;
 import ru.otus.springlibrary.domain.Genre;
-import ru.otus.springlibrary.exception.BookNotFoundException;
 import ru.otus.springlibrary.service.AuthorService;
 import ru.otus.springlibrary.service.BookService;
 import ru.otus.springlibrary.service.GenreService;
@@ -26,9 +25,7 @@ public class LibraryCLI {
 
     private static final String TYPE_IS_INCORRECT = "Type '%s' is incorrect! Possible types: %s";
 
-    private static final String ALREADY_EXISTS = "%s already exists!";
-
-    private static final String HAS_BEEN_SUCCESSFULLY_ADDED = "%s has been successfully added.";
+    private static final String HAS_BEEN_SUCCESSFULLY_ADDED = "'%s' has been successfully added.";
 
     private static final String AUTHOR = "author";
 
@@ -37,11 +34,6 @@ public class LibraryCLI {
     private static final String GENRE = "genre";
 
     private static final List<String> TYPES = Arrays.asList(AUTHOR, BOOK, GENRE);
-
-    private static final String CANNOT_REMOVE_ITEM_DOES_NOT_EXIST = "Cannot remove %s with id = %d. Item does not exist " +
-            "or has a reference from other item!";
-
-    private static final String SUCCESSFULLY_DELETED = "%s item with id = %d successfully deleted";
 
     private static final int DEFAULT_WIDTH = 80;
 
@@ -54,63 +46,49 @@ public class LibraryCLI {
     @ShellMethod("Show book reviews")
     @Transactional
     public Table showBookReviews(@ShellOption long bookId) {
-        try {
-            Book book = bookService.findById(bookId);
-            System.out.println(String.format("%d | %s | %s | %s", book.getId(), book.getTitle(), book.getAuthors(),
-                    book.getGenres()));
-            LinkedHashMap<String, Object> headers = new LinkedHashMap<>();
-            headers.put("id", "Id");
-            headers.put("review", "Review");
-            BeanListTableModel model = new BeanListTableModel<>(book.getReviews(), headers);
-            return wrapInTableWithReviews(model);
-        } catch (BookNotFoundException e) {
-            System.err.println(String.format("Book with id = %d does not exist!", bookId));
+        if (isIdNegative(bookId)) {
             return null;
         }
+        Book book = bookService.findById(bookId);
+        System.out.println(String.format("%d | %s | %s | %s", book.getId(), book.getTitle(), book.getAuthors(),
+                book.getGenres()));
+        LinkedHashMap<String, Object> headers = new LinkedHashMap<>();
+        headers.put("id", "Id");
+        headers.put("review", "Review");
+        BeanListTableModel model = new BeanListTableModel<>(book.getReviews(), headers);
+        return wrapInTableWithReviews(model);
     }
 
     @ShellMethod("Add review to book")
     public void addReview(@ShellOption long bookId,
                           @ShellOption String review) {
-        if (checkReviewLength(review)) {
+        if (isIdNegative(bookId) || isReviewTooLong(review)) {
             return;
         }
-        boolean result = bookService.addReview(bookId, review);
-        if (result) {
-            System.out.println("Review comment has been successfully added");
-        } else {
-            System.err.println("Review comment cannot be added");
-        }
+        printResult(bookService.addReview(bookId, review).toString());
     }
 
     @ShellMethod("Remove book review")
     public void removeReview(@ShellOption long reviewId) {
-        boolean result = bookService.deleteReview(reviewId);
-        if (result) {
-            System.out.println("Review comment has been successfully removed");
-        } else {
-            System.err.println("Review comment cannot be removed");
+        if (isIdNegative(reviewId)) {
+            return;
         }
+        bookService.deleteReview(reviewId);
     }
 
     @ShellMethod("Update book review")
     public void updateReview(@ShellOption long reviewId,
                              @ShellOption String updatedReview) {
-        if (checkReviewLength(updatedReview)) {
+        if (isIdNegative(reviewId) || isReviewTooLong(updatedReview)) {
             return;
         }
-        boolean result = bookService.updateReview(reviewId, updatedReview);
-        if (result) {
-            System.out.println("Review comment has been successfully updated");
-        } else {
-            System.err.println("Review comment cannot be updated");
-        }
+        bookService.updateReview(reviewId, updatedReview);
     }
 
     @ShellMethod("Show all books")
     @Transactional
     public String showAllBooks() {
-        List<Book> allBooks = bookService.getAllBooks();
+        Iterable<Book> allBooks = bookService.findAll();
         LinkedHashMap<String, Object> headers = new LinkedHashMap<>();
         headers.put("id", "Id");
         headers.put("title", "Title");
@@ -123,7 +101,7 @@ public class LibraryCLI {
 
     @ShellMethod("Show all authors")
     public Table showAllAuthors() {
-        List<Author> allAuthors = authorService.getAllAuthors();
+        Iterable<Author> allAuthors = authorService.findAll();
         LinkedHashMap<String, Object> headers = new LinkedHashMap<>();
         headers.put("id", "Id");
         headers.put("firstName", "First name");
@@ -134,7 +112,7 @@ public class LibraryCLI {
 
     @ShellMethod("Show all genres")
     public Table showAllGenres() {
-        List<Genre> allGenres = genreService.getAllGenres();
+        Iterable<Genre> allGenres = genreService.findAll();
         LinkedHashMap<String, Object> headers = new LinkedHashMap<>();
         headers.put("id", "Id");
         headers.put("genre", "Genre");
@@ -145,19 +123,27 @@ public class LibraryCLI {
     @ShellMethod("Add new author")
     public void addAuthor(@ShellOption String firstName,
                           @ShellOption String lastName) {
-        printResult(authorService.addAuthor(firstName, lastName), AUTHOR);
+        printResult(authorService.addAuthor(firstName, lastName).toString());
     }
 
     @ShellMethod("Add new book")
     public void addBook(@ShellOption String title,
                         @ShellOption List<Long> authorIDs,
                         @ShellOption List<Long> genreIDs) {
-        printResult(bookService.addBook(title, authorIDs, genreIDs), BOOK);
+        if (authorIDs.stream().anyMatch(id -> id < 0)) {
+            System.err.println("Author ID cannot be a negative number (<0).");
+            return;
+        }
+        if (genreIDs.stream().anyMatch(id -> id < 0)) {
+            System.err.println("Genre ID cannot be a negative number (<0).");
+            return;
+        }
+        printResult(bookService.addBook(title, authorIDs, genreIDs).toString());
     }
 
     @ShellMethod("Add new genre")
     public void addGenre(@ShellOption String genre) {
-        printResult(genreService.addGenre(genre), GENRE);
+        printResult(genreService.addGenre(genre).toString());
     }
 
     @ShellMethod("Remove item")
@@ -167,24 +153,21 @@ public class LibraryCLI {
         if (TYPES.stream().noneMatch(t -> t.equals(type))) {
             System.err.println(format(TYPE_IS_INCORRECT, type, Arrays.toString(TYPES.toArray())));
         }
-        boolean result;
+        if (isIdNegative(id)) {
+            return;
+        }
         switch (type) {
             case AUTHOR:
-                result = authorService.delete(id);
+                authorService.delete(id);
                 break;
             case BOOK:
-                result = bookService.delete(id);
+                bookService.delete(id);
                 break;
             case GENRE:
-                result = genreService.delete(id);
+                genreService.delete(id);
                 break;
             default:
                 throw new IllegalArgumentException(type + " is unsupported!");
-        }
-        if (result) {
-            System.out.println(format(SUCCESSFULLY_DELETED, type, id));
-        } else {
-            System.err.println(format(CANNOT_REMOVE_ITEM_DOES_NOT_EXIST, type, id));
         }
     }
 
@@ -201,17 +184,21 @@ public class LibraryCLI {
         return tableBuilder.build();
     }
 
-    private void printResult(boolean result, String type) {
-        if (result) {
-            System.out.println(format(HAS_BEEN_SUCCESSFULLY_ADDED, type));
-        } else {
-            System.err.println(format(ALREADY_EXISTS, type));
-        }
+    private void printResult(String item) {
+        System.out.println(format(HAS_BEEN_SUCCESSFULLY_ADDED, item));
     }
 
-    private boolean checkReviewLength(@ShellOption String newReview) {
+    private boolean isReviewTooLong(String newReview) {
         if (newReview.length() > 255) {
             System.err.println("Review text is longer than 255 symbols which is maximum allowed!");
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isIdNegative(long id) {
+        if (id < 0) {
+            System.err.println("Item ID cannot be a negative number (<0).");
             return true;
         }
         return false;
