@@ -1,5 +1,6 @@
 package ru.otus.springlibrary.service;
 
+import org.bson.types.ObjectId;
 import ru.otus.springlibrary.domain.Author;
 
 /**
@@ -28,5 +29,5 @@ public interface AuthorService {
      *
      * @param id author id
      */
-    void delete(long id);
+    void delete(ObjectId id);
 }

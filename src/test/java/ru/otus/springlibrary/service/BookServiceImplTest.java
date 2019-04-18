@@ -1,31 +1,29 @@
 package ru.otus.springlibrary.service;
 
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Example;
 import org.springframework.shell.jline.InteractiveShellApplicationRunner;
 import org.springframework.shell.jline.ScriptShellApplicationRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.domain.Book;
 import ru.otus.springlibrary.domain.Genre;
-import ru.otus.springlibrary.domain.Review;
-import ru.otus.springlibrary.exception.AuthorNotFoundException;
 import ru.otus.springlibrary.exception.BookNotFoundException;
-import ru.otus.springlibrary.exception.GenreNotFoundException;
-import ru.otus.springlibrary.exception.ReviewNotFoundException;
 import ru.otus.springlibrary.repository.AuthorRepository;
 import ru.otus.springlibrary.repository.BookRepository;
 import ru.otus.springlibrary.repository.GenreRepository;
-import ru.otus.springlibrary.repository.ReviewRepository;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(properties = {
@@ -41,70 +39,78 @@ class BookServiceImplTest {
     @Autowired
     BookService bookService;
 
-    @MockBean
+    @Autowired
     BookRepository bookRepository;
 
-    @MockBean
+    @Autowired
     AuthorRepository authorRepository;
 
-    @MockBean
+    @Autowired
     GenreRepository genreRepository;
 
-    @MockBean
-    ReviewRepository reviewRepository;
+    private ObjectId authorId1;
+
+    private ObjectId authorId2;
+
+    private ObjectId bookId;
+
+    private ObjectId genreId1;
+
+    private ObjectId genreId2;
 
     @BeforeEach
-    void setUp() throws AuthorNotFoundException, GenreNotFoundException, ReviewNotFoundException {
-        Author author1 = new Author(1, "test first name 1", "test last name 1", new ArrayList<>());
-        Author author2 = new Author(2, "test first name 2", "test last name 2", new ArrayList<>());
+    void setUp() {
+        bookRepository.deleteAll();
+        authorRepository.deleteAll();
+        genreRepository.deleteAll();
 
-        Genre genre1 = new Genre(1, "test genre 1", new ArrayList<>());
-        Genre genre2 = new Genre(2, "test genre 2", new ArrayList<>());
+        authorId1 = ObjectId.get();
+        authorId2 = ObjectId.get();
 
-        Review review = new Review(TEST_REVIEW);
-        ArrayList<Review> reviews = new ArrayList<>();
-        reviews.add(review);
+        Author author1 = new Author(authorId1, "test first name 1", "test last name 1");
+        Author author2 = new Author(authorId2, "test first name 2", "test last name 2");
 
-        Book book = new Book(1, TEST_TITLE, Collections.singletonList(author1), Collections.singletonList(genre1),
-                reviews);
-        review.setBook(book);
+        authorRepository.save(author1);
+        authorRepository.save(author2);
 
-        when(bookRepository.findAll()).thenReturn(Collections.singletonList(book));
+        genreId1 = ObjectId.get();
+        genreId2 = ObjectId.get();
 
-        // existing items
-        when(authorRepository.findById(1L)).thenReturn(Optional.of(author1));
-        when(authorRepository.findById(2L)).thenReturn(Optional.of(author2));
+        Genre genre1 = new Genre(genreId1, "test genre 1");
+        Genre genre2 = new Genre(genreId2, "test genre 2");
 
-        when(genreRepository.findById(1L)).thenReturn(Optional.of(genre1));
-        when(genreRepository.findById(2L)).thenReturn(Optional.of(genre2));
+        genreRepository.save(genre1);
+        genreRepository.save(genre2);
 
-        when(reviewRepository.findById(1L)).thenReturn(Optional.of(review));
-        when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+        bookId = ObjectId.get();
 
-        // items that does not exist
-        when(bookRepository.findById(2L)).thenThrow(BookNotFoundException.class);
-        when(reviewRepository.findById(2L)).thenThrow(ReviewNotFoundException.class);
+        Book book = new Book(bookId, TEST_TITLE, Collections.singletonList(author1), Collections.singletonList(genre1),
+                Collections.singletonList(TEST_REVIEW));
+
+        bookRepository.save(book);
     }
 
     @Test
     void addReview() {
-        assertDoesNotThrow(() -> bookService.addReview(1, TEST_REVIEW));
+        bookService.addReview(bookId, TEST_REVIEW);
+        Book book = bookRepository.findById(bookId).orElseThrow();
+        assertTrue(book.getReviews().stream().anyMatch(TEST_REVIEW::equals));
     }
 
     @Test
     void addReviewIfBookDoesNotExist() {
-        assertThrows(BookNotFoundException.class, () -> bookService.addReview(2, TEST_REVIEW));
+        assertThrows(BookNotFoundException.class, () -> bookService.addReview(ObjectId.get(), TEST_REVIEW));
     }
 
-    @Test
-    void deleteReview() {
-        assertDoesNotThrow(() -> bookService.deleteReview(1));
-    }
+//    @Test
+//    void deleteReview() {
+//        assertDoesNotThrow(() -> bookService.deleteReview(1));
+//    }
 
-    @Test
-    void deleteReviewIfReviewDoesNotExist() {
-        assertThrows(ReviewNotFoundException.class, () -> bookService.deleteReview(2));
-    }
+//    @Test
+//    void deleteReviewIfReviewDoesNotExist() {
+//        assertThrows(ReviewNotFoundException.class, () -> bookService.deleteReview(ObjectId.get()));
+//    }
 
     @Test
     void getAllBooks() {
@@ -117,15 +123,21 @@ class BookServiceImplTest {
 
     @Test
     void addBookWithAuthorAndGenre() {
-        List<Long> authorIDs = Arrays.asList(1L, 2L);
-        List<Long> genreIDs = Arrays.asList(1L, 2L);
+        List<ObjectId> authorIDs = Arrays.asList(authorId1, authorId2);
+        List<ObjectId> genreIDs = Arrays.asList(genreId1, genreId2);
         String title = "add new book test title";
 
         assertDoesNotThrow(() -> bookService.addBook(title, authorIDs, genreIDs));
+        Book book = bookRepository.findOne(Example.of(new Book(title))).orElseThrow();
+
+        assertNotNull(book.getId());
+        assertEquals(title, book.getTitle());
+
+        // todo check author and genres
     }
 
     @Test
     void removeBookWithAuthorAndGenre() {
-        assertDoesNotThrow(() -> bookService.delete(1));
+        assertDoesNotThrow(() -> bookService.delete(bookId));
     }
 }

@@ -1,24 +1,21 @@
 package ru.otus.springlibrary.service;
 
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.shell.jline.InteractiveShellApplicationRunner;
 import org.springframework.shell.jline.ScriptShellApplicationRunner;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.otus.springlibrary.domain.Genre;
 import ru.otus.springlibrary.repository.GenreRepository;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(properties = {
@@ -32,13 +29,15 @@ class GenreServiceImplTest {
     @Autowired
     GenreService genreService;
 
-    @MockBean
+    @Autowired
     GenreRepository genreRepository;
 
     @BeforeEach
     void setUp() {
-        Genre genre = new Genre(1, TEST_GENRE, new ArrayList<>());
-        when(genreRepository.findAll()).thenReturn(Collections.singletonList(genre));
+        genreRepository.deleteAll();
+        ObjectId genreId = ObjectId.get();
+        Genre genre = new Genre(genreId, TEST_GENRE);
+        genreRepository.save(genre);
     }
 
     @Test
