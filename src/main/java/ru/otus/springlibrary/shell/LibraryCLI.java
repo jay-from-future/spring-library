@@ -64,22 +64,21 @@ public class LibraryCLI {
         bookService.addReview(bookId, review);
     }
 
-//    @ShellMethod("Remove book review")
-//    public void removeReview(@ShellOption long reviewId) {
-//        if (isIdNegative(reviewId)) {
-//            return;
-//        }
-//        bookService.deleteReview(reviewId);
-//    }
+    @ShellMethod("Remove book review")
+    public void removeReview(@ShellOption ObjectId bookId,
+                             @ShellOption ObjectId reviewId) {
+        bookService.deleteReview(bookId, reviewId);
+    }
 
-//    @ShellMethod("Update book review")
-//    public void updateReview(@ShellOption long reviewId,
-//                             @ShellOption String updatedReview) {
-//        if (isIdNegative(reviewId) || isReviewTooLong(updatedReview)) {
-//            return;
-//        }
-//        bookService.updateReview(reviewId, updatedReview);
-//    }
+    @ShellMethod("Update book review")
+    public void updateReview(@ShellOption ObjectId bookId,
+                             @ShellOption ObjectId reviewId,
+                             @ShellOption String updatedReview) {
+        if (isReviewTooLong(updatedReview)) {
+            return;
+        }
+        bookService.updateReview(bookId, reviewId, updatedReview);
+    }
 
     @ShellMethod("Show all books")
     public String showAllBooks() {
@@ -133,30 +132,27 @@ public class LibraryCLI {
         printResult(genreService.addGenre(genre).toString());
     }
 
-//    @ShellMethod("Remove item")
-//    public void removeItem(@ShellOption String type,
-//                           @ShellOption long id) {
-//        // check that type exists
-//        if (TYPES.stream().noneMatch(t -> t.equals(type))) {
-//            System.err.println(format(TYPE_IS_INCORRECT, type, Arrays.toString(TYPES.toArray())));
-//        }
-//        if (isIdNegative(id)) {
-//            return;
-//        }
-//        switch (type) {
-//            case AUTHOR:
-//                authorService.delete(id);
-//                break;
-//            case BOOK:
-//                bookService.delete(id);
-//                break;
-//            case GENRE:
-//                genreService.delete(id);
-//                break;
-//            default:
-//                throw new IllegalArgumentException(type + " is unsupported!");
-//        }
-//    }
+    @ShellMethod("Remove item")
+    public void removeItem(@ShellOption String type,
+                           @ShellOption ObjectId id) {
+        // check that type exists
+        if (TYPES.stream().noneMatch(t -> t.equals(type))) {
+            System.err.println(format(TYPE_IS_INCORRECT, type, Arrays.toString(TYPES.toArray())));
+        }
+        switch (type) {
+            case AUTHOR:
+                authorService.delete(id);
+                break;
+            case BOOK:
+                bookService.delete(id);
+                break;
+            case GENRE:
+                genreService.delete(id);
+                break;
+            default:
+                throw new IllegalArgumentException(type + " is unsupported!");
+        }
+    }
 
     private Table wrapInTable(BeanListTableModel model) {
         TableBuilder tableBuilder = new TableBuilder(model);
@@ -164,9 +160,9 @@ public class LibraryCLI {
         return tableBuilder.build();
     }
 
-    private Table wrapInTableWithReviews(BeanListTableModel model) {
+    private Table wrapInTableWithReviews(TableModel model) {
         TableBuilder tableBuilder = new TableBuilder(model);
-        tableBuilder.on(CellMatchers.column(1)).addSizer(new AbsoluteWidthSizeConstraints(40));
+        tableBuilder.on(CellMatchers.column(0)).addSizer(new AbsoluteWidthSizeConstraints(40));
         tableBuilder.addFullBorder(BorderStyle.oldschool);
         return tableBuilder.build();
     }

@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection = "book")
@@ -23,7 +24,6 @@ public class Book {
     @Field(value = "title")
     private String title;
 
-//    @DBRef(lazy = true)
     @DBRef
     private List<Author> authors;
 
@@ -31,7 +31,7 @@ public class Book {
     private List<Genre> genres;
 
     @Field(value = "reviews")
-    private List<String> reviews;
+    private List<Review> reviews;
 
     public Book(String title, List<Author> authors, List<Genre> genres) {
         this.title = title;
@@ -39,7 +39,10 @@ public class Book {
         this.genres = genres;
     }
 
-    public Book(String title) {
-        this.title = title;
+    public List<Review> getReviews() {
+        if (reviews == null) {
+            reviews = new ArrayList<>();
+        }
+        return reviews;
     }
 }

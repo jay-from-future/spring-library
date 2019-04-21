@@ -47,23 +47,26 @@ public interface BookService {
     /**
      * Adds new review comment to the related book.
      *
-     * @param bookId         book id
+     * @param bookId     book id
      * @param reviewText review text
+     * @return review id
      */
-    void addReview(ObjectId bookId, String reviewText);
+    ObjectId addReview(ObjectId bookId, String reviewText);
 
     /**
      * Deletes review comment if exists.
      *
+     * @param bookId   book id
      * @param reviewId review id
      */
-    void deleteReview(ObjectId reviewId);
+    void deleteReview(ObjectId bookId, ObjectId reviewId);
 
     /**
      * Updates review comment if exists.
      *
+     * @param bookId            book id
      * @param reviewId          review id
      * @param updatedReviewText updated review text
      */
-    void updateReview(ObjectId reviewId, String updatedReviewText);
+    void updateReview(ObjectId bookId, ObjectId reviewId, String updatedReviewText);
 }

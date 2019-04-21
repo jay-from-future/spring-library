@@ -6,13 +6,15 @@ import org.springframework.stereotype.Service;
 import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.domain.Book;
 import ru.otus.springlibrary.domain.Genre;
+import ru.otus.springlibrary.domain.Review;
 import ru.otus.springlibrary.exception.BookNotFoundException;
+import ru.otus.springlibrary.exception.ReviewNotFoundException;
 import ru.otus.springlibrary.repository.AuthorRepository;
 import ru.otus.springlibrary.repository.BookRepository;
 import ru.otus.springlibrary.repository.GenreRepository;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,39 +33,24 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Book addBook(String title, List<ObjectId> authorIDs, List<ObjectId> genreIDs) {
+        List<Author> authors = authorIDs.stream()
+                .map(id -> authorRepository.findById(id).orElseThrow())
+                .collect(Collectors.toList());
 
-        // todo draft solution
-        
-        ObjectId aId = authorIDs.get(0);
-        Author author = authorRepository.findById(aId).orElseThrow();
+        List<Genre> genres = genreIDs.stream()
+                .map(id -> genreRepository.findById(id).orElseThrow())
+                .collect(Collectors.toList());
 
-        ObjectId gId = genreIDs.get(0);
-        Genre genre = genreRepository.findById(gId).orElseThrow();
-
-        Book book = new Book(title, Arrays.asList(author), Arrays.asList(genre));
+        Book book = new Book(title, authors, genres);
         return bookRepository.save(book);
     }
 
     @Override
     public void delete(ObjectId id) {
-        Book book = bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
+        // todo Authors and Genres without book will not be removed, but it is an open question when clean up them
+        // todo consider using Spring Batch later to clean up database
+        Book book = findBookById(id);
         bookRepository.delete(book);
-
-//        List<Author> authors = book.getAuthors();
-//        for (Author a : authors) {
-//            List<Book> books = a.getBooks();
-//            if (books.contains(book) && books.size() == 1) {
-//                authorRepository.delete(a);
-//            }
-//        }
-//
-//        List<Genre> genres = book.getGenres();
-//        for (Genre g : genres) {
-//            List<Book> books = g.getBooks();
-//            if (books.contains(book) && books.size() == 1) {
-//                genreRepository.delete(g);
-//            }
-//        }
     }
 
     @Override
@@ -72,23 +59,41 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public void addReview(ObjectId bookId, String review) {
-        Book book = bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
-        book.getReviews().add(review);
+    public ObjectId addReview(ObjectId bookId, String review) {
+        Book book = findBookById(bookId);
+        ObjectId reviewId = ObjectId.get();
+        book.getReviews().add(new Review(reviewId, review));
+        bookRepository.save(book);
+        return reviewId;
+    }
+
+    @Override
+    public void deleteReview(ObjectId bookId, ObjectId reviewId) {
+        Book book = findBookById(bookId);
+        List<Review> reviews = book.getReviews();
+        Review review = getReview(reviewId, reviews);
+        reviews.remove(review);
+        book.setReviews(reviews);
         bookRepository.save(book);
     }
 
     @Override
-    public void deleteReview(ObjectId reviewId) {
-//        List<Book> all = bookRepository.findAll();
-//        Review review = all.stream().flatMap(b -> b.getReviews().stream()).filter(r -> r.getId().equals(reviewId)).findFirst().orElseThrow(ReviewNotFoundException::new);
-//        review.setReview("deleted");
+    public void updateReview(ObjectId bookId, ObjectId reviewId, String updatedReviewText) {
+        Book book = findBookById(bookId);
+        Review review = getReview(reviewId, book.getReviews());
+        review.setReview(updatedReviewText);
+        bookRepository.save(book);
     }
 
-    @Override
-    public void updateReview(ObjectId reviewId, String updatedReviewText) {
-//        Review review = bookRepository.findAll().stream().flatMap(b -> b.getReviews().stream()).filter(r -> r.getId().equals(reviewId)).findFirst().orElseThrow(ReviewNotFoundException::new);
-//        review.setReview(updatedReviewText);
-//bookRepository.save()
+    private Review getReview(ObjectId reviewId, List<Review> reviews) {
+        return reviews.stream()
+                .filter(r -> r.getId().equals(reviewId))
+                .findFirst()
+                .orElseThrow(ReviewNotFoundException::new);
     }
+
+    private Book findBookById(ObjectId bookId) {
+        return bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
+    }
+
 }
