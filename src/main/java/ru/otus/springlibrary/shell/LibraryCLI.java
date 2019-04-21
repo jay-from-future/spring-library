@@ -162,7 +162,7 @@ public class LibraryCLI {
 
     private Table wrapInTableWithReviews(TableModel model) {
         TableBuilder tableBuilder = new TableBuilder(model);
-        tableBuilder.on(CellMatchers.column(0)).addSizer(new AbsoluteWidthSizeConstraints(40));
+        tableBuilder.on(CellMatchers.column(1)).addSizer(new AbsoluteWidthSizeConstraints(40));
         tableBuilder.addFullBorder(BorderStyle.oldschool);
         return tableBuilder.build();
     }
