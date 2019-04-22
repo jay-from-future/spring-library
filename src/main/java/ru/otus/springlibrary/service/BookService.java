@@ -1,7 +1,7 @@
 package ru.otus.springlibrary.service;
 
+import org.bson.types.ObjectId;
 import ru.otus.springlibrary.domain.Book;
-import ru.otus.springlibrary.domain.Review;
 import ru.otus.springlibrary.exception.BookNotFoundException;
 
 import java.util.List;
@@ -26,14 +26,14 @@ public interface BookService {
      * @param genreIDs  list of book genre IDs
      * @return added book
      */
-    Book addBook(String title, List<Long> authorIDs, List<Long> genreIDs);
+    Book addBook(String title, List<ObjectId> authorIDs, List<ObjectId> genreIDs);
 
     /**
      * Deletes book with such id
      *
      * @param id book id
      */
-    void delete(long id);
+    void delete(ObjectId id);
 
     /**
      * Finds book by id.
@@ -42,29 +42,31 @@ public interface BookService {
      * @return {@link Book} if book with such id exists
      * @throws BookNotFoundException if book with such id does not exist
      */
-    Book findById(long id) throws BookNotFoundException;
+    Book findById(ObjectId id) throws BookNotFoundException;
 
     /**
      * Adds new review comment to the related book.
      *
-     * @param id         book id
+     * @param bookId     book id
      * @param reviewText review text
-     * @return added review
+     * @return review id
      */
-    Review addReview(long id, String reviewText);
+    ObjectId addReview(ObjectId bookId, String reviewText);
 
     /**
      * Deletes review comment if exists.
      *
+     * @param bookId   book id
      * @param reviewId review id
      */
-    void deleteReview(long reviewId);
+    void deleteReview(ObjectId bookId, ObjectId reviewId);
 
     /**
      * Updates review comment if exists.
      *
+     * @param bookId            book id
      * @param reviewId          review id
      * @param updatedReviewText updated review text
      */
-    void updateReview(long reviewId, String updatedReviewText);
+    void updateReview(ObjectId bookId, ObjectId reviewId, String updatedReviewText);
 }

@@ -1,9 +1,8 @@
 package ru.otus.springlibrary.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.repository.CrudRepository;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.domain.Book;
 import ru.otus.springlibrary.domain.Genre;
@@ -13,7 +12,6 @@ import ru.otus.springlibrary.exception.ReviewNotFoundException;
 import ru.otus.springlibrary.repository.AuthorRepository;
 import ru.otus.springlibrary.repository.BookRepository;
 import ru.otus.springlibrary.repository.GenreRepository;
-import ru.otus.springlibrary.repository.ReviewRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,85 +26,74 @@ public class BookServiceImpl implements BookService {
 
     private final GenreRepository genreRepository;
 
-    private final ReviewRepository reviewRepository;
-
     @Override
     public Iterable<Book> findAll() {
         return bookRepository.findAll();
     }
 
     @Override
-    @Transactional
-    public Book addBook(String title, List<Long> authorIDs, List<Long> genreIDs) {
-        Book book = new Book(title);
+    public Book addBook(String title, List<ObjectId> authorIDs, List<ObjectId> genreIDs) {
+        List<Author> authors = authorIDs.stream()
+                .map(id -> authorRepository.findById(id).orElseThrow())
+                .collect(Collectors.toList());
 
-        List<Author> authors = convertIDsToEntities(authorIDs, authorRepository);
-        authors.forEach(book::addAuthor);
+        List<Genre> genres = genreIDs.stream()
+                .map(id -> genreRepository.findById(id).orElseThrow())
+                .collect(Collectors.toList());
 
-        List<Genre> genres = convertIDsToEntities(genreIDs, genreRepository);
-        genres.forEach(book::addGenre);
-
+        Book book = new Book(title, authors, genres);
         return bookRepository.save(book);
     }
 
     @Override
-    @Transactional
-    public void delete(long id) {
-        Book book = bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
+    public void delete(ObjectId id) {
+        // todo Authors and Genres without book will not be removed, but it is an open question when clean up them
+        // todo consider using Spring Batch later to clean up database
+        Book book = findBookById(id);
         bookRepository.delete(book);
-
-        List<Author> authors = book.getAuthors();
-        for (Author a : authors) {
-            List<Book> books = a.getBooks();
-            if (books.contains(book) && books.size() == 1) {
-                authorRepository.delete(a);
-            }
-        }
-
-        List<Genre> genres = book.getGenres();
-        for (Genre g : genres) {
-            List<Book> books = g.getBooks();
-            if (books.contains(book) && books.size() == 1) {
-                genreRepository.delete(g);
-            }
-        }
     }
 
     @Override
-    public Book findById(long id) {
+    public Book findById(ObjectId id) {
         return bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
     }
 
     @Override
-    @Transactional
-    public Review addReview(long id, String reviewText) {
-        Review review = new Review(reviewText);
-        Review savedReview = reviewRepository.save(review);
-
-        Book book = findById(id);
-        book.addReview(review);
+    public ObjectId addReview(ObjectId bookId, String review) {
+        Book book = findBookById(bookId);
+        ObjectId reviewId = ObjectId.get();
+        book.getReviews().add(new Review(reviewId, review));
         bookRepository.save(book);
-
-        return savedReview;
+        return reviewId;
     }
 
     @Override
-    public void deleteReview(long reviewId) {
-        Review review = reviewRepository.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
-        reviewRepository.delete(review);
+    public void deleteReview(ObjectId bookId, ObjectId reviewId) {
+        Book book = findBookById(bookId);
+        List<Review> reviews = book.getReviews();
+        Review review = getReview(reviewId, reviews);
+        reviews.remove(review);
+        book.setReviews(reviews);
+        bookRepository.save(book);
     }
 
     @Override
-    public void updateReview(long reviewId, String updatedReviewText) {
-        Review review = reviewRepository.findById(reviewId).orElseThrow(ReviewNotFoundException::new);
+    public void updateReview(ObjectId bookId, ObjectId reviewId, String updatedReviewText) {
+        Book book = findBookById(bookId);
+        Review review = getReview(reviewId, book.getReviews());
         review.setReview(updatedReviewText);
-        reviewRepository.save(review);
+        bookRepository.save(book);
     }
 
-    private <T> List<T> convertIDsToEntities(List<Long> ids, CrudRepository<T, Long> repository) {
-        return ids.stream()
-                .filter(repository::existsById)
-                .map(id -> repository.findById(id).orElseThrow())
-                .collect(Collectors.toList());
+    private Review getReview(ObjectId reviewId, List<Review> reviews) {
+        return reviews.stream()
+                .filter(r -> r.getId().equals(reviewId))
+                .findFirst()
+                .orElseThrow(ReviewNotFoundException::new);
     }
+
+    private Book findBookById(ObjectId bookId) {
+        return bookRepository.findById(bookId).orElseThrow(BookNotFoundException::new);
+    }
+
 }

@@ -1,5 +1,6 @@
 package ru.otus.springlibrary.service;
 
+import org.bson.types.ObjectId;
 import ru.otus.springlibrary.domain.Genre;
 
 /**
@@ -27,6 +28,6 @@ public interface GenreService {
      *
      * @param id genre id
      */
-    void delete(long id);
+    void delete(ObjectId id);
 
 }

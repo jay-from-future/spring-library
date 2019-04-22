@@ -1,11 +1,11 @@
 package ru.otus.springlibrary.shell;
 
 import lombok.RequiredArgsConstructor;
+import org.bson.types.ObjectId;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
 import org.springframework.shell.standard.ShellOption;
 import org.springframework.shell.table.*;
-import org.springframework.transaction.annotation.Transactional;
 import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.domain.Book;
 import ru.otus.springlibrary.domain.Genre;
@@ -44,13 +44,9 @@ public class LibraryCLI {
     private final GenreService genreService;
 
     @ShellMethod("Show book reviews")
-    @Transactional
-    public Table showBookReviews(@ShellOption long bookId) {
-        if (isIdNegative(bookId)) {
-            return null;
-        }
+    public Table showBookReviews(@ShellOption ObjectId bookId) {
         Book book = bookService.findById(bookId);
-        System.out.println(String.format("%d | %s | %s | %s", book.getId(), book.getTitle(), book.getAuthors(),
+        System.out.println(String.format("%s | %s | %s | %s", book.getId(), book.getTitle(), book.getAuthors(),
                 book.getGenres()));
         LinkedHashMap<String, Object> headers = new LinkedHashMap<>();
         headers.put("id", "Id");
@@ -60,33 +56,31 @@ public class LibraryCLI {
     }
 
     @ShellMethod("Add review to book")
-    public void addReview(@ShellOption long bookId,
+    public void addReview(@ShellOption ObjectId bookId,
                           @ShellOption String review) {
-        if (isIdNegative(bookId) || isReviewTooLong(review)) {
+        if (isReviewTooLong(review)) {
             return;
         }
-        printResult(bookService.addReview(bookId, review).toString());
+        bookService.addReview(bookId, review);
     }
 
     @ShellMethod("Remove book review")
-    public void removeReview(@ShellOption long reviewId) {
-        if (isIdNegative(reviewId)) {
-            return;
-        }
-        bookService.deleteReview(reviewId);
+    public void removeReview(@ShellOption ObjectId bookId,
+                             @ShellOption ObjectId reviewId) {
+        bookService.deleteReview(bookId, reviewId);
     }
 
     @ShellMethod("Update book review")
-    public void updateReview(@ShellOption long reviewId,
+    public void updateReview(@ShellOption ObjectId bookId,
+                             @ShellOption ObjectId reviewId,
                              @ShellOption String updatedReview) {
-        if (isIdNegative(reviewId) || isReviewTooLong(updatedReview)) {
+        if (isReviewTooLong(updatedReview)) {
             return;
         }
-        bookService.updateReview(reviewId, updatedReview);
+        bookService.updateReview(bookId, reviewId, updatedReview);
     }
 
     @ShellMethod("Show all books")
-    @Transactional
     public String showAllBooks() {
         Iterable<Book> allBooks = bookService.findAll();
         LinkedHashMap<String, Object> headers = new LinkedHashMap<>();
@@ -128,16 +122,8 @@ public class LibraryCLI {
 
     @ShellMethod("Add new book")
     public void addBook(@ShellOption String title,
-                        @ShellOption List<Long> authorIDs,
-                        @ShellOption List<Long> genreIDs) {
-        if (authorIDs.stream().anyMatch(id -> id < 0)) {
-            System.err.println("Author ID cannot be a negative number (<0).");
-            return;
-        }
-        if (genreIDs.stream().anyMatch(id -> id < 0)) {
-            System.err.println("Genre ID cannot be a negative number (<0).");
-            return;
-        }
+                        @ShellOption List<ObjectId> authorIDs,
+                        @ShellOption List<ObjectId> genreIDs) {
         printResult(bookService.addBook(title, authorIDs, genreIDs).toString());
     }
 
@@ -148,13 +134,10 @@ public class LibraryCLI {
 
     @ShellMethod("Remove item")
     public void removeItem(@ShellOption String type,
-                           @ShellOption long id) {
+                           @ShellOption ObjectId id) {
         // check that type exists
         if (TYPES.stream().noneMatch(t -> t.equals(type))) {
             System.err.println(format(TYPE_IS_INCORRECT, type, Arrays.toString(TYPES.toArray())));
-        }
-        if (isIdNegative(id)) {
-            return;
         }
         switch (type) {
             case AUTHOR:
@@ -177,7 +160,7 @@ public class LibraryCLI {
         return tableBuilder.build();
     }
 
-    private Table wrapInTableWithReviews(BeanListTableModel model) {
+    private Table wrapInTableWithReviews(TableModel model) {
         TableBuilder tableBuilder = new TableBuilder(model);
         tableBuilder.on(CellMatchers.column(1)).addSizer(new AbsoluteWidthSizeConstraints(40));
         tableBuilder.addFullBorder(BorderStyle.oldschool);
@@ -191,14 +174,6 @@ public class LibraryCLI {
     private boolean isReviewTooLong(String newReview) {
         if (newReview.length() > 255) {
             System.err.println("Review text is longer than 255 symbols which is maximum allowed!");
-            return true;
-        }
-        return false;
-    }
-
-    private boolean isIdNegative(long id) {
-        if (id < 0) {
-            System.err.println("Item ID cannot be a negative number (<0).");
             return true;
         }
         return false;

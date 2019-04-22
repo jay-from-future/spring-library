@@ -3,36 +3,25 @@ package ru.otus.springlibrary.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
-import javax.persistence.*;
-import java.util.List;
-
-@Entity
-@Table(name = "genre")
+@Document(collection = "genre")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@NamedQuery(name = "findAllGenres", query = "select g from Genre g")
 public class Genre {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "genre_generator")
-    @SequenceGenerator(name = "genre_generator", sequenceName = "genre_sequence", allocationSize = 1)
-    @Column(updatable = false)
-    private long id;
+    private ObjectId id;
 
-    @Column(name = "genre")
+    @Field(value = "genre")
     private String genre;
-
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "genres")
-    private List<Book> books;
 
     public Genre(String genre) {
         this.genre = genre;
-    }
-
-    public Genre(long id) {
-        this.id = id;
     }
 
     @Override
