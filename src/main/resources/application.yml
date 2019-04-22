@@ -2,3 +2,5 @@ spring:
   data:
     mongodb:
       database: library
+      host: localhost
+      port: 27017
