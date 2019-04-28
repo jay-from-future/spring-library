@@ -10,7 +10,7 @@ import ru.otus.springlibrary.configuration.ApplicationConfiguration;
 public class SpringLibraryApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SpringLibraryApplication.class, args).close();
+        SpringApplication.run(SpringLibraryApplication.class, args);
     }
 
 }

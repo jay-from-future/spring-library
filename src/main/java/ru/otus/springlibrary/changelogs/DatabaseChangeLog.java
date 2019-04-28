@@ -29,8 +29,8 @@ public class DatabaseChangeLog {
         ObjectId authorId = ObjectId.get();
         Document author = new Document()
                 .append("_id", authorId)
-                .append("first_name", "King")
-                .append("last_name", "Stephen");
+                .append("first_name", "Stephen")
+                .append("last_name", "King");
 
         db.getCollection("author").insertOne(author);
 

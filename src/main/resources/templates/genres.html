@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>List of all genres</title>
+</head>
+<body>
+<h1>Genres:</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Genre</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="genre : ${genres}">
+        <td th:text="${genre.id}">1</td>
+        <td th:text="${genre.genre}">Default genre</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
