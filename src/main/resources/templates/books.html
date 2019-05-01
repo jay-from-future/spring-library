@@ -23,6 +23,9 @@
         <td th:text="${book.title}">Title</td>
         <td th:text="${book.authors}">Author</td>
         <td th:text="${book.genres}">Genre</td>
+        <td>
+            <a th:href="@{/books/remove(id=${book.id})}" href="remove_book.html">Remove book</a>
+        </td>
     </tr>
     </tbody>
 </table>

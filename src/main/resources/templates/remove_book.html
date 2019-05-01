@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Add book</title>
+</head>
+<body>
+
+<div>
+    <p>Please, confirm that the following following book will be removed:</p>
+    <p th:text="${book.id} + ' : ' +${book.title}">1 : Title</p>
+</div>
+
+<form th:action="@{/books/remove}" th:method="delete" action="remove_book.html">
+    <input th:value="${book.id}" name="id" type="hidden">
+    <div>
+        <button type="submit">Remove</button>
+        <a href="books.html" th:href="@{/books}">
+            <button type="button">Cancel</button>
+        </a>
+    </div>
+</form>
+
+</body>
+</html>
