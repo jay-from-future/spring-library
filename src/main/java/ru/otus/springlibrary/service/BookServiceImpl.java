@@ -46,6 +46,29 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    public Book updateBook(ObjectId id, String title, List<ObjectId> authorIDs, List<ObjectId> genreIDs) {
+        Book book = bookRepository.findById(id).orElseThrow(BookNotFoundException::new);
+
+        // todo check which fields should be update beforehand to avoid useless fields update
+
+        book.setTitle(title);
+
+        List<Author> authors = authorIDs.stream()
+                .map(authorID -> authorRepository.findById(authorID).orElseThrow())
+                .collect(Collectors.toList());
+
+        book.setAuthors(authors);
+
+        List<Genre> genres = genreIDs.stream()
+                .map(genreId -> genreRepository.findById(genreId).orElseThrow())
+                .collect(Collectors.toList());
+
+        book.setGenres(genres);
+
+        return bookRepository.save(book);
+    }
+
+    @Override
     public void delete(ObjectId id) {
         // todo Authors and Genres without book will not be removed, but it is an open question when clean up them
         // todo consider using Spring Batch later to clean up database

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit book</title>
+</head>
+<body>
+
+<form th:action="@{/books/edit}" th:method="post" action="edit_book.html">
+    <label for="id-input">ID:</label>
+    <input id="id-input" th:value="${book.id}" name="id" readonly="readonly" value="1">
+
+    <label for="title-input">Title:</label>
+    <input id="title-input" th:value="${book.title}" name="title" value="Title">
+
+    <div>
+        <label for="author-input">Author:</label>
+        <select id="author-input" name="authorID">
+            <option th:each="author : ${authors}"
+                    th:value="${author.id}"
+                    th:text="${author.firstName} + ' ' + ${author.lastName}"
+                    th:selected="${book.authors[0].id.equals(author.id)}">
+                Author
+            </option>
+        </select>
+    </div>
+
+    <div>
+        <label for="genre-input">Genre:</label>
+        <select id="genre-input" name="genreID">
+            <option th:each="genre : ${genres}"
+                    th:value="${genre.id}"
+                    th:text="${genre.genre}"
+                    th:selected="${book.genres[0].id.equals(genre.id)}">
+                Genre
+            </option>
+        </select>
+    </div>
+
+    <div>
+        <button type="submit">Edit</button>
+        <button type="reset">Reset</button>
+    </div>
+</form>
+
+</body>
+</html>

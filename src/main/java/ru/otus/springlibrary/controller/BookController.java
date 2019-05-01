@@ -50,6 +50,25 @@ public class BookController {
         return "redirect:/books";
     }
 
+    @GetMapping("/books/edit")
+    public String showEditBookForm(@RequestParam ObjectId id,
+                                   Model model) {
+        Book book = bookService.findById(id);
+        model.addAttribute("book", book);
+        model.addAttribute("authors", authorService.findAll());
+        model.addAttribute("genres", genreService.findAll());
+        return "edit_book";
+    }
+
+    @PostMapping("/books/edit")
+    public String editBook(@RequestParam ObjectId id,
+                           @RequestParam String title,
+                           @RequestParam ObjectId authorID,
+                           @RequestParam ObjectId genreID) {
+        bookService.updateBook(id, title, List.of(authorID), List.of(genreID));
+        return "redirect:/books";
+    }
+
     @GetMapping("/books/remove")
     public String showRemoveBookForm(@RequestParam ObjectId id,
                                      Model model) {
