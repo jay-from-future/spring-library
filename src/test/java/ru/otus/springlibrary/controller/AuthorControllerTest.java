@@ -31,19 +31,17 @@ class AuthorControllerTest {
 
     @Test
     void listOfAllAuthors() throws Exception {
-        Author a1 = new Author(ObjectId.get(), "first_name_1", "last_name_1");
-        Author a2 = new Author(ObjectId.get(), "first_name_2", "last_name_2");
+        Author a1 = new Author("first_name_1", "last_name_1");
+        Author a2 = new Author("first_name_2", "last_name_2");
 
         given(authorService.findAll()).willReturn(List.of(a1, a2));
 
         this.mvc.perform(get("/authors"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(Matchers.allOf(
-                        Matchers.containsString(a1.getId().toString()),
                         Matchers.containsString(a1.getFirstName()),
                         Matchers.containsString(a1.getLastName()),
 
-                        Matchers.containsString(a2.getId().toString()),
                         Matchers.containsString(a2.getFirstName()),
                         Matchers.containsString(a2.getLastName())
                 )));

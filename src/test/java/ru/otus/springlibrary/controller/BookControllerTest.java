@@ -72,7 +72,6 @@ class BookControllerTest {
         this.mvc.perform(get("/books"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(Matchers.allOf(
-                        Matchers.containsString(book.getId().toString()),
                         Matchers.containsString(book.getTitle()),
                         Matchers.containsString(book.getAuthors().toString()),
                         Matchers.containsString(book.getGenres().toString())

@@ -2,26 +2,56 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
+    <link href="../public/css/bootstrap.css" rel="stylesheet" th:href="@{/css/bootstrap.css}"/>
     <title>List of all authors</title>
 </head>
-<body>
-<h1>Authors:</h1>
+<body class="d-flex flex-column h-100">
 
-<table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>First Name</th>
-        <th>Last Name</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="author : ${authors}">
-        <td th:text="${author.id}">1</td>
-        <td th:text="${author.firstName}">First Name</td>
-        <td th:text="${author.lastName}">Last Name</td>
-    </tr>
-    </tbody>
-</table>
+<main role="main" class="flex-shrink-0">
+    <div class="container">
+        <ul class="nav nav-pills nav-fill">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/}" href="index.html">Main</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/books}" href="books.html">Books</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" th:href="@{/authors}" href="authors.html">Authors</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/genres}" href="genres.html">Genres</a>
+            </li>
+        </ul>
+    </div>
+</main>
+
+<main role="main" class="flex-shrink-0">
+    <div class="container">
+        <h1 class="mt-5">Authors:</h1>
+        <p class="lead">List of all authors in the library:</p>
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="author : ${authors}">
+                <td th:text="${author.firstName}">First Name</td>
+                <td th:text="${author.lastName}">Last Name</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<footer class="footer mt-auto py-3">
+    <div class="container">
+        <span class="text-muted">&copy; Spring Library</span>
+    </div>
+</footer>
+
 </body>
 </html>

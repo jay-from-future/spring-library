@@ -2,46 +2,61 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
+    <link href="../public/css/bootstrap.css" rel="stylesheet" th:href="@{/css/bootstrap.css}"/>
     <title>Edit book</title>
 </head>
-<body>
+<body class="d-flex flex-column h-100">
 
-<form th:action="@{/books/edit}" th:method="post" action="edit_book.html">
-    <label for="id-input">ID:</label>
-    <input id="id-input" th:value="${book.id}" name="id" readonly="readonly" value="1">
+<main role="main" class="flex-shrink-0">
+    <div class="container">
+        <h1 class="mt-5">Edit book</h1>
+        <p class="lead">Change book details below:</p>
 
-    <label for="title-input">Title:</label>
-    <input id="title-input" th:value="${book.title}" name="title" value="Title">
+        <form th:action="@{/books/edit}" th:method="post" action="edit_book.html">
+            <input th:value="${book.id}" name="id" readonly="readonly" type="hidden">
 
-    <div>
-        <label for="author-input">Author:</label>
-        <select id="author-input" name="authorID">
-            <option th:each="author : ${authors}"
-                    th:value="${author.id}"
-                    th:text="${author.firstName} + ' ' + ${author.lastName}"
-                    th:selected="${book.authors[0].id.equals(author.id)}">
-                Author
-            </option>
-        </select>
+            <div class="form-group">
+                <label for="title-input">Title:</label>
+                <input id="title-input" th:value="${book.title}" class="form-control" name="title" value="Title">
+            </div>
+            
+            <div class="form-group">
+                <label for="author-input">Author:</label>
+                <select id="author-input" class="form-control" name="authorID">
+                    <option th:each="author : ${authors}"
+                            th:value="${author.id}"
+                            th:text="${author.firstName} + ' ' + ${author.lastName}"
+                            th:selected="${book.authors[0].id.equals(author.id)}">
+                        Author
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="genre-input">Genre:</label>
+                <select id="genre-input" class="form-control" name="genreID">
+                    <option th:each="genre : ${genres}"
+                            th:value="${genre.id}"
+                            th:text="${genre.genre}"
+                            th:selected="${book.genres[0].id.equals(genre.id)}">
+                        Genre
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn badge-primary">Save</button>
+                <button type="reset" class="btn badge-secondary">Reset</button>
+            </div>
+        </form>
     </div>
+</main>
 
-    <div>
-        <label for="genre-input">Genre:</label>
-        <select id="genre-input" name="genreID">
-            <option th:each="genre : ${genres}"
-                    th:value="${genre.id}"
-                    th:text="${genre.genre}"
-                    th:selected="${book.genres[0].id.equals(genre.id)}">
-                Genre
-            </option>
-        </select>
+<footer class="footer mt-auto py-3">
+    <div class="container">
+        <span class="text-muted">&copy; Spring Library</span>
     </div>
-
-    <div>
-        <button type="submit">Edit</button>
-        <button type="reset">Reset</button>
-    </div>
-</form>
+</footer>
 
 </body>
 </html>

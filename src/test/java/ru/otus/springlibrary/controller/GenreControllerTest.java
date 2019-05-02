@@ -31,18 +31,15 @@ class GenreControllerTest {
 
     @Test
     void listOfAllGenres() throws Exception {
-        Genre g1 = new Genre(ObjectId.get(), "genre 1");
-        Genre g2 = new Genre(ObjectId.get(), "genre 2");
+        Genre g1 = new Genre("genre 1");
+        Genre g2 = new Genre("genre 2");
 
         given(genreService.findAll()).willReturn(List.of(g1, g2));
 
         this.mvc.perform(get("/genres"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(Matchers.allOf(
-                        Matchers.containsString(g1.getId().toString()),
                         Matchers.containsString(g1.getGenre()),
-
-                        Matchers.containsString(g2.getId().toString()),
                         Matchers.containsString(g2.getGenre())
                 )));
 

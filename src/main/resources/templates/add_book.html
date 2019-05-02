@@ -2,45 +2,57 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <link href="../public/css/bootstrap.css" rel="stylesheet" th:href="@{/css/bootstrap.css}"/>
     <title>Add book</title>
 </head>
-<body>
+<body class="d-flex flex-column h-100">
 
-<form th:action="@{/books/add}" th:method="post" action="add_book.html">
-    <h1>Book data:</h1>
+<main role="main" class="flex-shrink-0">
+    <div class="container">
+        <form th:action="@{/books/add}" th:method="post" action="add_book.html">
+            <h1 class="mt-5">Add new book</h1>
+            <p class="lead">Fill book details below:</p>
+            <div class="form-group">
+                <label for="title-input">Title:</label>
+                <input id="title-input" class="form-control" name="title" type="text"
+                       placeholder="Input book title here"/>
+            </div>
 
-    <div>
-        <label for="title-input">Title:</label>
-        <input id="title-input" name="title" type="text" placeholder="Input book title here"/>
+            <div class="form-group">
+                <label for="author-input">Author:</label>
+                <select id="author-input" class="form-control" name="authorID">
+                    <option th:value="0">Please select...</option>
+                    <option th:each="author : ${authors}" th:value="${author.id}"
+                            th:text="${author.firstName} + ' ' + ${author.lastName}">
+                        Author
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="genre-input">Genre:</label>
+                <select id="genre-input" class="form-control" name="genreID">
+                    <option th:value="0">Please select</option>
+                    <option th:each="genre : ${genres}" th:value="${genre.id}"
+                            th:text="${genre.genre}">
+                        Genre
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="reset" class="btn btn-secondary">Reset</button>
+            </div>
+        </form>
     </div>
+</main>
 
-    <div>
-        <label for="author-input">Author:</label>
-        <select id="author-input" name="authorID">
-            <option th:value="0">Please select...</option>
-            <option th:each="author : ${authors}" th:value="${author.id}"
-                    th:text="${author.firstName} + ' ' + ${author.lastName}">
-                Author
-            </option>
-        </select>
+<footer class="footer mt-auto py-3">
+    <div class="container">
+        <span class="text-muted">&copy; Spring Library</span>
     </div>
-
-    <div>
-        <label for="genre-input">Genre:</label>
-        <select id="genre-input" name="genreID">
-            <option th:value="0">Please select</option>
-            <option th:each="genre : ${genres}" th:value="${genre.id}"
-                    th:text="${genre.genre}">
-                Genre
-            </option>
-        </select>
-    </div>
-
-    <div>
-        <button type="submit">Save</button>
-        <button type="reset">Reset</button>
-    </div>
-</form>
+</footer>
 
 </body>
 </html>
