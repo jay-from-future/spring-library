@@ -1,7 +1,7 @@
 package ru.otus.springlibrary.changelogs;
 
-import com.github.mongobee.changeset.ChangeLog;
-import com.github.mongobee.changeset.ChangeSet;
+import com.github.cloudyrock.mongock.ChangeLog;
+import com.github.cloudyrock.mongock.ChangeSet;
 import com.mongodb.DBRef;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
