@@ -4,15 +4,18 @@ import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.otus.springlibrary.domain.Book;
+import ru.otus.springlibrary.dto.BookDTO;
 import ru.otus.springlibrary.service.AuthorService;
 import ru.otus.springlibrary.service.BookService;
 import ru.otus.springlibrary.service.GenreService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -33,8 +36,9 @@ public class BookController {
     }
 
     @GetMapping("/books/add")
-    public String showAddNewBookForm(Model model) {
-        // todo test approach when we have few authors/genres in DB
+    public String showAddNewBookForm(BookDTO bookDTO, Model model) {
+        model.addAttribute("bookDTO", bookDTO);
+        // test approach when we have few authors/genres in DB
         model.addAttribute("authors", authorService.findAll());
         model.addAttribute("genres", genreService.findAll());
         return "add_book";
@@ -42,19 +46,23 @@ public class BookController {
 
 
     @PostMapping("/books/add")
-    public String addBook(@RequestParam String title,
-                          @RequestParam ObjectId authorID,
-                          @RequestParam ObjectId genreID) {
-        // todo amount of possible authors/genres has been reduced to 1 to simplify UI
-        bookService.addBook(title, List.of(authorID), List.of(genreID));
+    public String addBook(@Valid BookDTO bookDTO, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            // test approach when we have few authors/genres in DB
+            model.addAttribute("authors", authorService.findAll());
+            model.addAttribute("genres", genreService.findAll());
+            return "add_book";
+        }
+        // amount of possible authors/genres has been reduced to 1 to simplify UI
+        bookService.addBook(bookDTO.getTitle(), List.of(new ObjectId(bookDTO.getAuthorId())),
+                List.of(new ObjectId(bookDTO.getGenreId())));
         return "redirect:/books";
     }
 
     @GetMapping("/books/edit")
-    public String showEditBookForm(@RequestParam ObjectId id,
-                                   Model model) {
-        Book book = bookService.findById(id);
-        model.addAttribute("book", book);
+    public String showEditBookForm(@RequestParam ObjectId id, Model model) {
+        BookDTO bookDTO = mapBookToBookDTO(bookService.findById(id));
+        model.addAttribute("bookDTO", bookDTO);
         model.addAttribute("authors", authorService.findAll());
         model.addAttribute("genres", genreService.findAll());
         return "edit_book";
@@ -62,10 +70,17 @@ public class BookController {
 
     @PostMapping("/books/edit")
     public String editBook(@RequestParam ObjectId id,
-                           @RequestParam String title,
-                           @RequestParam ObjectId authorID,
-                           @RequestParam ObjectId genreID) {
-        bookService.updateBook(id, title, List.of(authorID), List.of(genreID));
+                           @Valid BookDTO bookDTO,
+                           BindingResult bindingResult,
+                           Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("authors", authorService.findAll());
+            model.addAttribute("genres", genreService.findAll());
+            return "edit_book";
+        }
+        List<ObjectId> authorIDs = List.of(new ObjectId(bookDTO.getAuthorId()));
+        List<ObjectId> genreIDs = List.of(new ObjectId(bookDTO.getGenreId()));
+        bookService.updateBook(id, bookDTO.getTitle(), authorIDs, genreIDs);
         return "redirect:/books";
     }
 
@@ -81,5 +96,14 @@ public class BookController {
     public String removeBook(@RequestParam ObjectId id) {
         bookService.delete(id);
         return "redirect:/books";
+    }
+
+    private BookDTO mapBookToBookDTO(Book book) {
+        BookDTO bookDTO = new BookDTO();
+        bookDTO.setId(book.getId().toString());
+        bookDTO.setTitle(book.getTitle());
+        bookDTO.setAuthorId(book.getAuthors().get(0).getId().toString());
+        bookDTO.setGenreId(book.getGenres().get(0).getId().toString());
+        return bookDTO;
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.domain.Book;
 import ru.otus.springlibrary.domain.Genre;
@@ -22,8 +23,8 @@ import java.util.List;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(BookController.class)
@@ -67,8 +68,6 @@ class BookControllerTest {
 
     @Test
     void listOfAllBooks() throws Exception {
-
-
         this.mvc.perform(get("/books"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(Matchers.allOf(
@@ -78,4 +77,38 @@ class BookControllerTest {
                 )));
     }
 
+    @Test
+    void addBook() throws Exception {
+        this.mvc.perform(get("/books/add"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(Matchers.allOf(
+                        Matchers.containsString("Fill book details below"),
+                        Matchers.containsString("Title"),
+                        Matchers.containsString("Author"),
+                        Matchers.containsString("Genre")
+                )));
+
+        MockHttpServletRequestBuilder addBook = post("/books/add")
+                .param("id", book.getId().toString())
+                .param("title", book.getTitle())
+                .param("authorId", book.getAuthors().get(0).getId().toString())
+                .param("genreId", book.getGenres().get(0).getId().toString());
+
+        this.mvc.perform(addBook)
+                .andExpect(status().is(302))
+                .andExpect(model().hasNoErrors())
+                .andExpect(redirectedUrl("/books"));
+    }
+
+    @Test
+    void tryToAddBookWithEmptyTitle() throws Exception {
+        MockHttpServletRequestBuilder addBook = post("/books/add")
+                .param("id", book.getId().toString())
+                .param("title", "")
+                .param("authorId", book.getAuthors().get(0).getId().toString())
+                .param("genreId", book.getGenres().get(0).getId().toString());
+
+        this.mvc.perform(addBook)
+                .andExpect(model().hasErrors());
+    }
 }

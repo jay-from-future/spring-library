@@ -59,7 +59,6 @@ class AuthorControllerTest {
 
     @Test
     void addAuthor() throws Exception {
-
         this.mvc.perform(get("/authors/add"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(Matchers.allOf(
