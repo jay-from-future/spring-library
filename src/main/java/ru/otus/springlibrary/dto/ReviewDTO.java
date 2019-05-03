@@ -11,6 +11,6 @@ public class ReviewDTO {
     @ValidObjectId
     private String bookId;
 
-    @NotEmpty
+    @NotEmpty(message = "{review.not_empty}")
     private String review;
 }
