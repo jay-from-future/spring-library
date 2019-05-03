@@ -42,9 +42,9 @@ public class BookController {
 
 
     @PostMapping("/books/add")
-    public String addNewBook(@RequestParam String title,
-                             @RequestParam ObjectId authorID,
-                             @RequestParam ObjectId genreID) {
+    public String addBook(@RequestParam String title,
+                          @RequestParam ObjectId authorID,
+                          @RequestParam ObjectId genreID) {
         // todo amount of possible authors/genres has been reduced to 1 to simplify UI
         bookService.addBook(title, List.of(authorID), List.of(genreID));
         return "redirect:/books";
