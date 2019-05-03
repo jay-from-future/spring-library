@@ -64,6 +64,7 @@ class BookControllerTest {
         given(authorService.findAll()).willReturn(authors);
         given(genreService.findAll()).willReturn(genres);
         given(bookService.findAll()).willReturn(List.of(book));
+        given(bookService.findById(book.getId())).willReturn(book);
     }
 
     @Test
@@ -111,4 +112,28 @@ class BookControllerTest {
         this.mvc.perform(addBook)
                 .andExpect(model().hasErrors());
     }
+
+    @Test
+    void addReview() throws Exception {
+        MockHttpServletRequestBuilder addReview = post("/books/reviews")
+                .param("bookId", book.getId().toString())
+                .param("review", "test review");
+
+        this.mvc.perform(addReview)
+                .andExpect(status().is(302))
+                .andExpect(model().hasNoErrors())
+                .andExpect(redirectedUrl("/books/reviews?id=" + book.getId()));
+    }
+
+    @Test
+    void tryToAddEmptyReview() throws Exception {
+        MockHttpServletRequestBuilder addReview = post("/books/reviews")
+                .param("bookId", book.getId().toString())
+                .param("review", "");
+
+        this.mvc.perform(addReview)
+                .andExpect(model().hasErrors());
+    }
+
+
 }

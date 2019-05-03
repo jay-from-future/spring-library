@@ -9,6 +9,25 @@
 
 <main role="main" class="flex-shrink-0">
     <div class="container">
+        <ul class="nav nav-pills nav-fill">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/}" href="index.html">Main</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" th:href="@{/books}" href="books.html">Books</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/authors}" href="authors.html">Authors</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/genres}" href="genres.html">Genres</a>
+            </li>
+        </ul>
+    </div>
+</main>
+
+<main role="main" class="flex-shrink-0">
+    <div class="container">
         <form method="post" action="#" th:action="@{/books/add}" th:object="${bookDTO}">
             <h1 class="mt-5">Add new book</h1>
             <p class="lead">Fill book details below:</p>

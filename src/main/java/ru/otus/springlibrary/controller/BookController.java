@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.otus.springlibrary.domain.Book;
 import ru.otus.springlibrary.dto.BookDTO;
+import ru.otus.springlibrary.dto.ReviewDTO;
 import ru.otus.springlibrary.service.AuthorService;
 import ru.otus.springlibrary.service.BookService;
 import ru.otus.springlibrary.service.GenreService;
@@ -85,8 +86,7 @@ public class BookController {
     }
 
     @GetMapping("/books/remove")
-    public String showRemoveBookForm(@RequestParam ObjectId id,
-                                     Model model) {
+    public String showRemoveBookForm(@RequestParam ObjectId id, Model model) {
         Book book = bookService.findById(id);
         model.addAttribute("book", book);
         return "remove_book";
@@ -96,6 +96,26 @@ public class BookController {
     public String removeBook(@RequestParam ObjectId id) {
         bookService.delete(id);
         return "redirect:/books";
+    }
+
+    @GetMapping("/books/reviews")
+    public String showReviewsForm(@RequestParam ObjectId id, ReviewDTO reviewDTO, Model model) {
+        Book book = bookService.findById(id);
+        model.addAttribute("book", book);
+        reviewDTO.setBookId(id.toString());
+        model.addAttribute("reviewDTO", reviewDTO);
+        return "reviews";
+    }
+
+    @PostMapping("/books/reviews")
+    public String addReview(@Valid ReviewDTO reviewDTO, BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            Book book = bookService.findById(new ObjectId(reviewDTO.getBookId()));
+            model.addAttribute("book", book);
+            return "reviews";
+        }
+        bookService.addReview(new ObjectId(reviewDTO.getBookId()), reviewDTO.getReview());
+        return "redirect:/books/reviews?id=" + reviewDTO.getBookId();
     }
 
     private BookDTO mapBookToBookDTO(Book book) {
