@@ -70,6 +70,7 @@ class BookControllerTest {
     @Test
     void listOfAllBooks() throws Exception {
         this.mvc.perform(get("/books"))
+                .andExpect(view().name("books"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(Matchers.allOf(
                         Matchers.containsString(book.getTitle()),
@@ -81,6 +82,7 @@ class BookControllerTest {
     @Test
     void addBook() throws Exception {
         this.mvc.perform(get("/books/add"))
+                .andExpect(view().name("add_book"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(Matchers.allOf(
                         Matchers.containsString("Fill book details below"),
@@ -110,6 +112,7 @@ class BookControllerTest {
                 .param("genreId", book.getGenres().get(0).getId().toString());
 
         this.mvc.perform(addBook)
+                .andExpect(view().name("add_book"))
                 .andExpect(model().hasErrors());
     }
 
@@ -132,6 +135,7 @@ class BookControllerTest {
                 .param("review", "");
 
         this.mvc.perform(addReview)
+                .andExpect(view().name("reviews"))
                 .andExpect(model().hasErrors());
     }
 

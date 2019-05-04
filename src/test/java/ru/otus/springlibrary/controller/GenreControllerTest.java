@@ -1,6 +1,5 @@
 package ru.otus.springlibrary.controller;
 
-import org.bson.types.ObjectId;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -16,8 +15,7 @@ import java.util.List;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(GenreController.class)
@@ -37,6 +35,7 @@ class GenreControllerTest {
         given(genreService.findAll()).willReturn(List.of(g1, g2));
 
         this.mvc.perform(get("/genres"))
+                .andExpect(view().name("genres"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(Matchers.allOf(
                         Matchers.containsString(g1.getGenre()),

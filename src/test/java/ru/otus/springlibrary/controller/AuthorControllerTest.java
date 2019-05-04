@@ -48,6 +48,7 @@ class AuthorControllerTest {
     void listOfAllAuthors() throws Exception {
         this.mvc.perform(get("/authors"))
                 .andExpect(status().isOk())
+                .andExpect(view().name("authors"))
                 .andExpect(content().string(Matchers.allOf(
                         Matchers.containsString(a1.getFirstName()),
                         Matchers.containsString(a1.getLastName()),
@@ -61,6 +62,7 @@ class AuthorControllerTest {
     void addAuthor() throws Exception {
         this.mvc.perform(get("/authors/add"))
                 .andExpect(status().isOk())
+                .andExpect(view().name("add_author"))
                 .andExpect(content().string(Matchers.allOf(
                         Matchers.containsString("Fill author details below"),
                         Matchers.containsString("First name"),
@@ -82,6 +84,7 @@ class AuthorControllerTest {
                 post("/authors/add")
                         .param("firstName", EMPTY)
                         .param("lastName", a1.getLastName()))
+                .andExpect(view().name("add_author"))
                 .andExpect(model().hasErrors());
     }
 
@@ -91,6 +94,7 @@ class AuthorControllerTest {
                 post("/authors/add")
                         .param("firstName", a1.getFirstName())
                         .param("lastName", EMPTY))
+                .andExpect(view().name("add_author"))
                 .andExpect(model().hasErrors());
     }
 }
