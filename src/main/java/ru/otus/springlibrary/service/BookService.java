@@ -29,6 +29,17 @@ public interface BookService {
     Book addBook(String title, List<ObjectId> authorIDs, List<ObjectId> genreIDs);
 
     /**
+     * Adds new book into library
+     *
+     * @param id        book id
+     * @param title     book title
+     * @param authorIDs list of book author IDs
+     * @param genreIDs  list of book genre IDs
+     * @return added book
+     */
+    Book updateBook(ObjectId id, String title, List<ObjectId> authorIDs, List<ObjectId> genreIDs);
+
+    /**
      * Deletes book with such id
      *
      * @param id book id

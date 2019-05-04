@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <link href="../public/css/bootstrap.css" rel="stylesheet" th:href="@{/css/bootstrap.css}"/>
+    <title>Edit book</title>
+</head>
+<body class="d-flex flex-column h-100">
+
+<main role="main" class="flex-shrink-0">
+    <div class="container">
+        <ul class="nav nav-pills nav-fill">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/}" href="index.html">Main</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" th:href="@{/books}" href="books.html">Books</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/authors}" href="authors.html">Authors</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/genres}" href="genres.html">Genres</a>
+            </li>
+        </ul>
+    </div>
+</main>
+
+<main role="main" class="flex-shrink-0">
+    <div class="container">
+        <h1 class="mt-5">Edit book</h1>
+        <p class="lead">Change book details below:</p>
+
+        <form method="post" action="#" th:action="@{/books/edit}" th:object="${bookDTO}">
+            <input th:value="*{id}" name="id" readonly="readonly" type="hidden">
+
+            <div class="form-group">
+                <label for="title-input">Title:</label>
+                <input id="title-input" class="form-control" value="Title" th:field="*{title}" th:value="*{title}"
+                       th:classappend="${#fields.hasErrors('title')? 'is-invalid' : ''}">
+                <div class="invalid-feedback" th:errors="*{title}">
+                    Looks bad!
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="author-input">Author:</label>
+                <select id="author-input" class="form-control" th:field="*{authorId}"
+                        th:classappend="${#fields.hasErrors('authorId')? 'is-invalid' : ''}">
+                    <option th:each="author : ${authors}"
+                            th:value="${author.id}"
+                            th:text="${author.firstName} + ' ' + ${author.lastName}"
+                            th:selected="${bookDTO.authorId.equals(author.id.toString())}">
+                        Author
+                    </option>
+                </select>
+                <div class="invalid-feedback" th:errors="*{authorId}">
+                    Looks bad!
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="genre-input">Genre:</label>
+                <select id="genre-input" class="form-control" th:field="*{genreId}"
+                        th:classappend="${#fields.hasErrors('genreId')? 'is-invalid' : ''}">
+                    <option th:each="genre : ${genres}"
+                            th:value="${genre.id}"
+                            th:text="${genre.genre}"
+                            th:selected="${bookDTO.genreId.equals(genre.id.toString())}">
+                        Genre
+                    </option>
+                </select>
+                <div class="invalid-feedback" th:errors="*{genreId}">
+                    Looks bad!
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn badge-primary">Save</button>
+                <button type="reset" class="btn badge-secondary">Reset</button>
+            </div>
+        </form>
+    </div>
+</main>
+
+<footer class="footer mt-auto py-3">
+    <div class="container">
+        <span class="text-muted">&copy; Spring Library</span>
+    </div>
+</footer>
+
+</body>
+</html>

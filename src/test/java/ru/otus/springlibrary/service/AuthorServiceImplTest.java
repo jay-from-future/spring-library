@@ -7,11 +7,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.shell.jline.InteractiveShellApplicationRunner;
-import org.springframework.shell.jline.ScriptShellApplicationRunner;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-import ru.otus.springlibrary.TestApplicationConfiguration;
 import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.exception.AuthorNotFoundException;
 import ru.otus.springlibrary.repository.AuthorRepository;
@@ -25,11 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(properties = {
-        ScriptShellApplicationRunner.SPRING_SHELL_SCRIPT_ENABLED + "=false",
-        InteractiveShellApplicationRunner.SPRING_SHELL_INTERACTIVE_ENABLED + "=false"
-})
-@ContextConfiguration(classes = TestApplicationConfiguration.class)
+@SpringBootTest
 class AuthorServiceImplTest {
 
     private static final String FIRST_NAME = "test first name";

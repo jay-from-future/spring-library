@@ -23,16 +23,16 @@
 
         <maven-surefire-plugin.version>2.22.1</maven-surefire-plugin.version>
 
-        <spring-shell-starter.version>2.0.0.RELEASE</spring-shell-starter.version>
         <spring-boot-starter-data-jpa.version>2.1.4.RELEASE</spring-boot-starter-data-jpa.version>
 
         <lombok.version>1.18.</lombok.version>
         <h2.version>1.4.197</h2.version>
-        <mongobee.version>0.13</mongobee.version>
+        <bson.version>3.8.2</bson.version>
+        <mongock-spring.version>2.0.0</mongock-spring.version>
+        <hibernate-validator.version>6.0.16.Final</hibernate-validator.version>
 
         <junit.jupiter.version>5.3.2</junit.jupiter.version>
         <mockito.version>2.23.4</mockito.version>
-        <bson.version>3.8.2</bson.version>
     </properties>
 
     <dependencies>
@@ -50,9 +50,21 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>com.github.mongobee</groupId>
-            <artifactId>mongobee</artifactId>
-            <version>${mongobee.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.cloudyrock.mongock</groupId>
+            <artifactId>mongock-spring</artifactId>
+            <version>${mongock-spring.version}</version>
         </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
@@ -66,19 +78,18 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibernate-validator.version}</version>
+        </dependency>
+        <dependency>
             <groupId>de.flapdoodle.embed</groupId>
             <artifactId>de.flapdoodle.embed.mongo</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.shell</groupId>
-            <artifactId>spring-shell-starter</artifactId>
-            <version>${spring-shell-starter.version}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
