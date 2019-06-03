@@ -4,48 +4,51 @@ import org.bson.types.ObjectId;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import ru.otus.springlibrary.domain.Author;
 import ru.otus.springlibrary.domain.Book;
 import ru.otus.springlibrary.domain.Genre;
 import ru.otus.springlibrary.domain.Review;
-import ru.otus.springlibrary.service.AuthorService;
-import ru.otus.springlibrary.service.BookService;
-import ru.otus.springlibrary.service.GenreService;
+import ru.otus.springlibrary.repository.AuthorRepository;
+import ru.otus.springlibrary.repository.BookRepository;
+import ru.otus.springlibrary.repository.GenreRepository;
 
 import java.util.List;
 
-import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
-@WebMvcTest(BookController.class)
+@SpringBootTest
+@WebAppConfiguration
 class BookControllerTest {
 
+    private MockMvc mockMvc;
+
     @Autowired
-    private MockMvc mvc;
+    private AuthorRepository authorRepository;
 
-    @MockBean
-    private AuthorService authorService;
+    @Autowired
+    private GenreRepository genreRepository;
 
-    @MockBean
-    private GenreService genreService;
+    @Autowired
+    private BookRepository bookRepository;
 
-    @MockBean
-    private BookService bookService;
+    @Autowired
+    private WebApplicationContext context;
 
     private Book book;
 
     @BeforeEach
     void setUp() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+
+        // clear all and populates with test author
         Author a1 = new Author(ObjectId.get(), "first_name_1", "last_name_1");
         Author a2 = new Author(ObjectId.get(), "first_name_2", "last_name_2");
 
@@ -61,83 +64,19 @@ class BookControllerTest {
 
         book = new Book(ObjectId.get(), "title 1", authors, genres, reviews);
 
-        given(authorService.findAll()).willReturn(authors);
-        given(genreService.findAll()).willReturn(genres);
-        given(bookService.findAll()).willReturn(List.of(book));
-        given(bookService.findById(book.getId())).willReturn(book);
+        authorRepository.deleteAll();
+        genreRepository.deleteAll();
+        bookRepository.deleteAll();
+
+        authorRepository.saveAll(authors);
+        genreRepository.saveAll(genres);
+        bookRepository.save(book);
     }
 
     @Test
     void listOfAllBooks() throws Exception {
-        this.mvc.perform(get("/books"))
-                .andExpect(view().name("books"))
+        this.mockMvc.perform(get("/books"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(Matchers.allOf(
-                        Matchers.containsString(book.getTitle()),
-                        Matchers.containsString(book.getAuthors().toString()),
-                        Matchers.containsString(book.getGenres().toString())
-                )));
+                .andExpect(content().string(Matchers.containsString(book.getTitle())));
     }
-
-    @Test
-    void addBook() throws Exception {
-        this.mvc.perform(get("/books/add"))
-                .andExpect(view().name("add_book"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(Matchers.allOf(
-                        Matchers.containsString("Fill book details below"),
-                        Matchers.containsString("Title"),
-                        Matchers.containsString("Author"),
-                        Matchers.containsString("Genre")
-                )));
-
-        MockHttpServletRequestBuilder addBook = post("/books/add")
-                .param("id", book.getId().toString())
-                .param("title", book.getTitle())
-                .param("authorId", book.getAuthors().get(0).getId().toString())
-                .param("genreId", book.getGenres().get(0).getId().toString());
-
-        this.mvc.perform(addBook)
-                .andExpect(status().is(302))
-                .andExpect(model().hasNoErrors())
-                .andExpect(redirectedUrl("/books"));
-    }
-
-    @Test
-    void tryToAddBookWithEmptyTitle() throws Exception {
-        MockHttpServletRequestBuilder addBook = post("/books/add")
-                .param("id", book.getId().toString())
-                .param("title", "")
-                .param("authorId", book.getAuthors().get(0).getId().toString())
-                .param("genreId", book.getGenres().get(0).getId().toString());
-
-        this.mvc.perform(addBook)
-                .andExpect(view().name("add_book"))
-                .andExpect(model().hasErrors());
-    }
-
-    @Test
-    void addReview() throws Exception {
-        MockHttpServletRequestBuilder addReview = post("/books/reviews")
-                .param("bookId", book.getId().toString())
-                .param("review", "test review");
-
-        this.mvc.perform(addReview)
-                .andExpect(status().is(302))
-                .andExpect(model().hasNoErrors())
-                .andExpect(redirectedUrl("/books/reviews?id=" + book.getId()));
-    }
-
-    @Test
-    void tryToAddEmptyReview() throws Exception {
-        MockHttpServletRequestBuilder addReview = post("/books/reviews")
-                .param("bookId", book.getId().toString())
-                .param("review", "");
-
-        this.mvc.perform(addReview)
-                .andExpect(view().name("reviews"))
-                .andExpect(model().hasErrors());
-    }
-
-
 }

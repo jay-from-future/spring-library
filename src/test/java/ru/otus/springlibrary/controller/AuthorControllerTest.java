@@ -1,100 +1,97 @@
 package ru.otus.springlibrary.controller;
 
 import org.hamcrest.Matchers;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import ru.otus.springlibrary.domain.Author;
-import ru.otus.springlibrary.service.AuthorService;
+import ru.otus.springlibrary.repository.AuthorRepository;
 
-import java.util.List;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-@RunWith(SpringRunner.class)
-@WebMvcTest(AuthorController.class)
+@SpringBootTest
+@WebAppConfiguration
 class AuthorControllerTest {
 
-    private static final String EMPTY = "";
+    private static final String UPDATED = "UPDATED";
+
+    private MockMvc mockMvc;
 
     @Autowired
-    private MockMvc mvc;
+    private AuthorRepository authorRepository;
 
-    @MockBean
-    private AuthorService authorService;
+    @Autowired
+    private WebApplicationContext context;
 
-    private Author a1;
-
-    private Author a2;
+    private Author author;
 
     @BeforeEach
     void setUp() {
-        a1 = new Author("first_name_1", "last_name_1");
-        a2 = new Author("first_name_2", "last_name_2");
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
 
-        given(authorService.findAll()).willReturn(List.of(a1, a2));
-        given(authorService.addAuthor("first_name_1", "last_name_1")).willReturn(a1);
+        // clear all and populates with test author
+        authorRepository.deleteAll();
+        author = new Author("first_name", "last_name");
+        authorRepository.save(author);
     }
 
     @Test
     void listOfAllAuthors() throws Exception {
-        this.mvc.perform(get("/authors"))
+        mockMvc.perform(get("/authors").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(view().name("authors"))
                 .andExpect(content().string(Matchers.allOf(
-                        Matchers.containsString(a1.getFirstName()),
-                        Matchers.containsString(a1.getLastName()),
-
-                        Matchers.containsString(a2.getFirstName()),
-                        Matchers.containsString(a2.getLastName())
-                )));
+                        Matchers.containsString(author.getFirstName()),
+                        Matchers.containsString(author.getLastName()))));
     }
 
     @Test
-    void addAuthor() throws Exception {
-        this.mvc.perform(get("/authors/add"))
+    void createUpdateAndDeleteAuthor() throws Exception {
+        String testFirstName = "test_first_name";
+        String testLastName = "test_last_name";
+
+        // create & read
+        MvcResult result = this.mockMvc.perform(
+                post("/authors")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(String.format(" { \"firstName\": \"%s\", \"lastName\": \"%s\" }", testFirstName,
+                                testLastName)))
+                .andExpect(status().isCreated())
+                .andExpect(content().string(Matchers.allOf(
+                        Matchers.containsString(testFirstName),
+                        Matchers.containsString(testLastName)
+                )))
+                .andReturn();
+
+        JSONObject jsonObject = new JSONObject(result.getResponse().getContentAsString());
+        String selfLink = jsonObject.getJSONObject("_links").getJSONObject("self").getString("href");
+
+        // update
+        this.mockMvc.perform(
+                patch(selfLink)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(String.format(" { \"firstName\": \"%s\", \"lastName\": \"%s\" }", testFirstName + UPDATED,
+                                testLastName))
+        )
                 .andExpect(status().isOk())
-                .andExpect(view().name("add_author"))
                 .andExpect(content().string(Matchers.allOf(
-                        Matchers.containsString("Fill author details below"),
-                        Matchers.containsString("First name"),
-                        Matchers.containsString("Last name")
+                        Matchers.containsString(testFirstName + UPDATED),
+                        Matchers.containsString(testLastName)
                 )));
 
-        this.mvc.perform(
-                post("/authors/add")
-                        .param("firstName", a1.getFirstName())
-                        .param("lastName", a1.getLastName()))
-                .andExpect(status().is(302))
-                .andExpect(model().hasNoErrors())
-                .andExpect(redirectedUrl("/authors"));
-    }
-
-    @Test
-    void tryToAddAuthorWithEmptyFirstName() throws Exception {
-        this.mvc.perform(
-                post("/authors/add")
-                        .param("firstName", EMPTY)
-                        .param("lastName", a1.getLastName()))
-                .andExpect(view().name("add_author"))
-                .andExpect(model().hasErrors());
-    }
-
-    @Test
-    void tryToAddAuthorWithEmptyLastName() throws Exception {
-        this.mvc.perform(
-                post("/authors/add")
-                        .param("firstName", a1.getFirstName())
-                        .param("lastName", EMPTY))
-                .andExpect(view().name("add_author"))
-                .andExpect(model().hasErrors());
+        // delete
+        this.mockMvc.perform(delete(selfLink)).andExpect(status().isNoContent());
+        this.mockMvc.perform(get(selfLink)).andExpect(status().isNotFound());
     }
 }
