@@ -1,41 +1,54 @@
 package ru.otus.springlibrary.controller;
 
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import ru.otus.springlibrary.domain.Genre;
-import ru.otus.springlibrary.service.GenreService;
+import ru.otus.springlibrary.repository.GenreRepository;
 
 import java.util.List;
 
-import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
-@WebMvcTest(GenreController.class)
+@SpringBootTest
+@WebAppConfiguration
 class GenreControllerTest {
 
-    @Autowired
-    private MockMvc mvc;
+    private MockMvc mockMvc;
 
-    @MockBean
-    private GenreService genreService;
+    @Autowired
+    private WebApplicationContext context;
+
+    @Autowired
+    private GenreRepository genreRepository;
+
+    private Genre g1;
+
+    private Genre g2;
+
+    @BeforeEach
+    void setUp() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
+
+        // clear all and populates with test author
+        g1 = new Genre("genre 1");
+        g2 = new Genre("genre 2");
+
+        genreRepository.deleteAll();
+        genreRepository.saveAll(List.of(g1, g2));
+    }
 
     @Test
     void listOfAllGenres() throws Exception {
-        Genre g1 = new Genre("genre 1");
-        Genre g2 = new Genre("genre 2");
-
-        given(genreService.findAll()).willReturn(List.of(g1, g2));
-
-        this.mvc.perform(get("/genres"))
-                .andExpect(view().name("genres"))
+        this.mockMvc.perform(get("/genres"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(Matchers.allOf(
                         Matchers.containsString(g1.getGenre()),
