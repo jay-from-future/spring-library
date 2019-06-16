@@ -2,13 +2,17 @@ package ru.otus.springlibrary.changelogs;
 
 import com.github.cloudyrock.mongock.ChangeLog;
 import com.github.cloudyrock.mongock.ChangeSet;
+import com.mongodb.BasicDBObject;
 import com.mongodb.DBRef;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @ChangeLog
 public class DatabaseChangeLog {
@@ -87,5 +91,164 @@ public class DatabaseChangeLog {
                 .append("reviews", List.of(review0, review1, review2));
 
         db.getCollection("book").insertOne(book);
+    }
+
+    @ChangeSet(order = "004", id = "importMoreAuthorsAndGenres", author = "Grigorii Liullin")
+    public void importMoreAuthorsAndGenres(MongoDatabase db) {
+
+        String[] genres = new String[]{
+                "Action and Adventure",
+                "Anthology",
+                "Classic",
+                "Comic and Graphic Novel",
+                "Crime and Detective",
+                "Drama",
+                "Fable",
+                "Fairy Tale",
+                "Fan-Fiction",
+                "Fantasy",
+                "Historical Fiction",
+                "Horror",
+                "Humor",
+                "Legend",
+                "Magical Realism",
+                "Mystery",
+                "Mythology",
+                "Realistic Fiction",
+                "Romance",
+                "Satire",
+                "Science Fiction (Sci-Fi)",
+                "Short Story",
+                "Suspense/Thriller",
+                "Biography/Autobiography",
+                "Essay",
+                "Memoir",
+                "Narrative Nonfiction",
+                "Periodicals",
+                "Reference Books",
+                "Self-help Book",
+                "Speech",
+                "Textbook",
+                "Poetry"
+        };
+
+        List<Document> genreDocuments = Arrays.stream(genres)
+                .map(g -> new Document()
+                        .append("_id", ObjectId.get())
+                        .append("genre", g))
+                .collect(Collectors.toList());
+
+        db.getCollection("genre").insertMany(genreDocuments);
+
+        String[] authors = new String[]{
+                "Mitsuru Adachi",
+                "Jirō Akagawa",
+                "Horatio Alger",
+                "Gosho Aoyama",
+                "Hirohiko Araki",
+                "Jeffrey Archer",
+                "David Baldacci",
+                "Enid Blyton",
+                "Norman Bridwell",
+                "Dan Brown",
+                "Edgar Burroughs",
+                "Erskine Caldwell",
+                "Lewis Carroll",
+                "Barbara Cartland",
+                "Agatha Christie",
+                "Tom Clancy",
+                "Paulo Coelho",
+                "Jackie Collins",
+                "Robin Cook",
+                "Catherine Cookson",
+                "Patricia Cornwell",
+                "John Creasey",
+                "Michael Crichton",
+                "Clive Cussler",
+                "Roald Dahl",
+                "Janet Dailey",
+                "Frédéric Dard",
+                "EL James",
+                "Ian Fleming",
+                "Ken Follett",
+                "Anne Golon",
+                "René Goscinny",
+                "Zane Grey",
+                "John Grisham",
+                "Arthur Hailey",
+                "Roger Hargreaves",
+                "Hermann Hesse",
+                "Eleanor Hibbert",
+                "Evan Hunter",
+                "Jin Yong",
+                "Penny Jordan",
+                "Judith Krantz",
+                "Masashi Kishimoto",
+                "Dean Koontz",
+                "Louis L'Amour",
+                "Astrid Lindgren",
+                "Robert Ludlum",
+                "Alistair MacLean",
+                "Debbie Macomber",
+                "Ann M. Martin",
+                "Karl May",
+                "Stephenie Meyer",
+                "Seiichi Morimura",
+                "Andrew Neiderman",
+                "Nicholas Sparks",
+                "Kyotaro Nishimura",
+                "Eiichiro Oda",
+                "Gilbert Patten",
+                "James Patterson",
+                "Beatrix Potter",
+                "Alexander Pushkin",
+                "Anne Rice",
+                "Harold Robbins",
+                "Nora Roberts",
+                "Denise Robins",
+                "Joanne  Rowling",
+                "Richard Scarry",
+                "William Shakespeare",
+                "Sidney Sheldon",
+                "Ryōtarō Shiba",
+                "Georges Simenon",
+                "Wilbur Smith",
+                "Mickey Spillane",
+                "Danielle Steel",
+                "Rex Stout",
+                "Rumiko Takahashi",
+                "Corín Tellado",
+                "Osamu Tezuka",
+                "Tite Kubo",
+                "Leo Tolstoy",
+                "Akira Toriyama",
+                "Yasuo Uchida",
+                "Gérard Villiers",
+                "Edgar Wallace",
+                "Irving Wallace",
+                "Cao Xueqin",
+                "Eiji Yoshikawa"
+        };
+
+        List<Document> authorDocuments = Arrays.stream(authors)
+                .map(a -> {
+                    String[] nameParts = a.split(" ");
+                    if (nameParts.length < 2) {
+                        throw new IllegalArgumentException("Dataset is corrupted!");
+                    }
+                    String firstName = nameParts[0];
+                    String lastName = nameParts[1];
+                    return new Document()
+                            .append("_id", ObjectId.get())
+                            .append("first_name", firstName)
+                            .append("last_name", lastName);
+                })
+                .collect(Collectors.toList());
+
+        db.getCollection("author").insertMany(authorDocuments);
+
+        List<Bson> pipeline = Collections.singletonList(new BasicDBObject("$project",
+                new BasicDBObject("full_name", new BasicDBObject("$concat", Arrays.asList("$first_name", " ", "$last_name")))));
+        db.createView("authorWithFullNamesView", "author", pipeline);
     }
 }
