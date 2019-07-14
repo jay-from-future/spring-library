@@ -12,8 +12,7 @@ ru:
   otus:
     springlibrary:
       configuration:
-        # checkTokenEndpointURL: https://spring-library-auth.herokuapp.com/oauth/check_token
-        checkTokenEndpointURL: http://localhost:8081/oauth/check_token
+        checkTokenEndpointURL: https://spring-library-auth.herokuapp.com/oauth/check_token
         resourceId: spring-library-oauth2-server
         clientId: spring-library-jwt-client
         clientSecret: admin1234
