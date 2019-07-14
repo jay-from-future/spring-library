@@ -1,7 +1,9 @@
 package ru.otus.springlibrary.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
@@ -12,13 +14,24 @@ import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 @EnableResourceServer
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
 
+    @Value("${ru.otus.springlibrary.configuration.checkTokenEndpointURL}")
+    private String checkTokenEndpointURL;
+
+    @Value("${ru.otus.springlibrary.configuration.resourceId}")
+    private String resourceId;
+
+    @Value("${ru.otus.springlibrary.configuration.clientId}")
+    private String clientId;
+
+    @Value("${ru.otus.springlibrary.configuration.clientSecret}")
+    private String clientSecret;
+
     @Bean
     public RemoteTokenServices remoteTokenServices() {
         RemoteTokenServices tokenServices = new RemoteTokenServices();
-        // todo these values shouldn't be hardcoded
-        tokenServices.setCheckTokenEndpointUrl("https://spring-library-auth.herokuapp.com/oauth/check_token");
-        tokenServices.setClientId("spring-library-jwt-client");
-        tokenServices.setClientSecret("admin1234");
+        tokenServices.setCheckTokenEndpointUrl(checkTokenEndpointURL);
+        tokenServices.setClientId(clientId);
+        tokenServices.setClientSecret(clientSecret);
         return tokenServices;
     }
 
@@ -27,13 +40,21 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
         http.requestMatchers()
                 .and()
                 .authorizeRequests()
-                .antMatchers("/**")
-                .access("#oauth2.hasScope('read')");
+                .antMatchers(HttpMethod.GET)
+                .access("hasRole('USER')")
+                .and()
+                .authorizeRequests()
+                .antMatchers(HttpMethod.POST)
+                .access("hasRole('USER')")
+                .and()
+                .authorizeRequests()
+                .antMatchers(HttpMethod.DELETE)
+                .access("hasRole('ADMIN')");
     }
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) {
-        resources.resourceId("spring-library-oauth2-server");
+        resources.resourceId(resourceId);
     }
 
 }
